@@ -2,7 +2,7 @@
     --canvas: #f5f0ea;
     --nav: #022e4a;
     --nav-light: #173e54;
-    --muted-nav: #e2d8cb;
+    --nav-muted: #e2d8cb;
     --surface: #ffffff;
     --soft: #e2d8cb;
     --accent: #56061d;
@@ -10,8 +10,11 @@
     --border: #d9d5ce;
     --ink: #022e4a;
     --muted: #5b6871;
-    --danger: #b34138;
 }
+
+/* ==========================================
+   RESET
+========================================== */
 
 * {
     box-sizing: border-box;
@@ -19,37 +22,51 @@
 
 body {
     margin: 0;
-    color: var(--ink);
     background: var(--canvas);
-    font-family: Inter, Arial, sans-serif;
+    color: var(--ink);
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 14px;
     line-height: 1.45;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
 }
 
 a {
     color: inherit;
 }
 
-button, input, textarea {
-    font: inherit;
-}
+/* ==========================================
+   LAYOUT UTAMA
+========================================== */
 
 .dashboard {
-    min-height: 100vh;
     display: grid;
     grid-template-columns: 244px minmax(0, 1fr);
+    min-height: 100vh;
 }
 
-/* SIDEBAR */
+/* ==========================================
+   SIDEBAR PENGHUNI
+========================================== */
 
 .sidebar {
     min-height: 100vh;
     background: var(--nav);
     color: white;
+
     padding: 32px 20px 24px;
+
     display: flex;
     flex-direction: column;
     gap: 24px;
 }
+
+/* Logo */
 
 .brand {
     display: flex;
@@ -60,40 +77,69 @@ button, input, textarea {
 
 .brand strong {
     font-size: 27px;
-    font-weight: 700;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    color: white;
 }
 
+.brand svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+/* Ruang penghuni */
+
 .workspace {
-    background: var(--nav-light);
-    border-radius: 10px;
-    padding: 12px;
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 4px;
+
+    background: var(--nav-light);
+    padding: 12px;
+    border-radius: 10px;
 }
 
 .workspace small {
+    color: var(--nav-muted);
     font-size: 13px;
-    color: var(--muted-nav);
 }
 
 .workspace span {
+    color: white;
     font-size: 14px;
+    font-weight: 500;
 }
 
+/* Navigasi */
+
 .sidebar-nav {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 8px;
 }
 
 .nav-item {
-    border-radius: 10px;
-    color: var(--muted-nav);
-    padding: 12px;
-    font-size: 14px;
     display: flex;
     align-items: center;
     gap: 12px;
+
+    min-height: 44px;
+    padding: 12px;
+
+    border-radius: 10px;
+
+    color: var(--nav-muted);
     text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.nav-item svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
 }
 
 .nav-item.active {
@@ -101,8 +147,8 @@ button, input, textarea {
     color: white;
 }
 
-.nav-item:not(.muted):hover {
-    background: #6b1930;
+.nav-item.active:hover {
+    background: #70102c;
     color: white;
 }
 
@@ -110,56 +156,72 @@ button, input, textarea {
     cursor: default;
 }
 
-.nav-subitem {
-    margin-left: 32px;
-    padding: 7px 12px;
-    font-size: 13px;
-}
-
-.nav-subitem.selected {
-    color: white;
-    font-weight: 600;
-}
+/* Bagian bawah sidebar */
 
 .sidebar-bottom {
     margin-top: auto;
-    display: grid;
-    gap: 16px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
 }
 
 .sidebar-help {
     background: var(--nav-light);
-    border-radius: 16px;
     padding: 16px;
+    border-radius: 16px;
+}
+
+.sidebar-help strong {
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .sidebar-help p {
-    color: var(--muted-nav);
+    margin: 8px 0 0;
+    color: var(--nav-muted);
     font-size: 13px;
-    margin: 7px 0 0;
+    line-height: 1.45;
 }
 
-.signout-dot {
-    border: 2px solid var(--muted-nav);
-    width: 18px;
-    height: 18px;
-    border-radius: 5px;
+.nav-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 12px;
+
+    color: var(--nav-muted);
+    font-size: 14px;
 }
 
-/* HEADER */
+.nav-footer svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* ==========================================
+   AREA KONTEN
+========================================== */
 
 .main-panel {
     min-width: 0;
+    background: var(--canvas);
 }
 
+/* Header */
+
 .topbar {
+    width: 100%;
     height: 80px;
-    background: white;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 24px;
     gap: 24px;
+
+    background: white;
+    padding: 0 24px;
 }
 
 .topbar-path {
@@ -167,31 +229,52 @@ button, input, textarea {
     font-size: 13px;
 }
 
+.topbar-path span {
+    margin: 0 14px;
+}
+
 .topbar-user {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 22px;
+}
+
+.bell {
+    display: flex;
+    align-items: center;
+    color: var(--muted);
 }
 
 .avatar {
     width: 36px;
     height: 36px;
-    background: var(--soft);
+    flex-shrink: 0;
+
     border-radius: 50%;
+
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+
+    background: var(--soft);
     color: var(--accent);
-    font-weight: 600;
+
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .user-text {
-    display: grid;
-    min-width: 120px;
+    min-width: 160px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .user-text strong {
+    color: var(--ink);
     font-size: 14px;
+    font-weight: 500;
 }
 
 .user-text small {
@@ -199,18 +282,24 @@ button, input, textarea {
     font-size: 13px;
 }
 
-/* PAGE CONTENT */
+/* ==========================================
+   PAGE CONTENT
+========================================== */
 
 .page-content {
-    max-width: 1430px;
+    width: 100%;
     padding: 40px;
 }
 
+/* Breadcrumb */
+
 .breadcrumb {
-    font-size: 13px;
+    margin-bottom: 24px;
     color: var(--muted);
-    margin-bottom: 22px;
+    font-size: 13px;
 }
+
+/* Judul */
 
 .page-heading {
     display: flex;
@@ -220,23 +309,38 @@ button, input, textarea {
 }
 
 .page-heading h1 {
-    font-size: 28px;
     margin: 0;
+
+    color: var(--ink);
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.45;
 }
+
+/* Subtitle */
 
 .page-lead {
-    margin: 12px 0 24px;
-    font-size: 15px;
+    margin: 20px 0 24px;
+
     color: var(--muted);
+    font-size: 15px;
 }
 
+/* Badge */
+
 .tag {
-    border-radius: 100px;
-    padding: 8px 10px;
-    font-size: 13px;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+
     width: max-content;
+    max-width: 100%;
+
+    border-radius: 100px;
+    padding: 8px 10px;
+
+    font-size: 13px;
+    font-weight: 400;
 }
 
 .tag-brand,
@@ -246,63 +350,92 @@ button, input, textarea {
 }
 
 .tag-status {
-    background: #e7eef3;
-    color: var(--nav);
+    background: var(--soft);
+    color: var(--accent);
 }
+
+/* ==========================================
+   GRID FORM DAN INFORMASI KOST
+========================================== */
 
 .content-grid {
     display: grid;
-    grid-template-columns: minmax(0, 760px) minmax(265px, 332px);
-    gap: 24px;
+
+    grid-template-columns: minmax(0, 1fr) 330px;
+
     align-items: start;
+    gap: 24px;
+
+    width: 100%;
 }
 
-.main-card,
-.hunian-card {
-    border: 1px solid var(--border);
-    background: white;
-    border-radius: 16px;
-}
+/* Kartu form utama */
 
 .main-card {
-    padding: 28px;
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 20px;
+
     min-width: 0;
+
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+
+    padding: 27px;
 }
 
-.main-card form {
+/* ==========================================
+   INFORMASI KOST DI ATAS FORM
+========================================== */
+
+.residence-highlight {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    background: var(--soft);
+    padding: 20px;
+
+    border-radius: 10px;
+}
+
+.residence-highlight strong {
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.residence-highlight p {
+    margin: 0;
+
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.45;
+}
+
+/* ==========================================
+   FORM UC-08
+========================================== */
+
+.keluhan-form {
+    width: 100%;
     min-width: 0;
 }
 
 .main-card fieldset {
-    border: 0;
-    padding: 0;
-    min-width: 0;
     margin: 0;
-    display: grid;
+    padding: 0;
+    border: none;
+
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
     gap: 20px;
 }
 
-/* FORM */
-
-.residence-highlight {
-    background: var(--soft);
-    border-radius: 10px;
-    padding: 20px;
-    display: grid;
-    gap: 8px;
-}
-
-.residence-highlight strong {
-    font-size: 14px;
-}
-
-.residence-highlight p {
-    font-size: 15px;
-    color: var(--muted);
-    margin: 0;
-}
+/* Dua input sejajar */
 
 .form-grid {
     display: grid;
@@ -310,142 +443,238 @@ button, input, textarea {
     gap: 20px;
 }
 
+/* Field */
+
 .field {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 8px;
+
     min-width: 0;
 }
 
-.field label:not(.upload-area) {
-    font-size: 14px;
+.field > label {
+    color: var(--ink);
+    font-size: 15px;
     font-weight: 500;
 }
 
-.field label span {
+.field > label span {
     color: var(--accent);
 }
 
-.field input[type=text],
-.field textarea {
+/* Input judul dan lokasi */
+
+.field input[type="text"] {
+    width: 100%;
+    height: 44px;
+
+    padding: 12px 15px;
+
+    background: white;
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 13px 16px;
-    width: 100%;
+
     color: var(--ink);
-    background: white;
     font-size: 15px;
+
+    outline: none;
 }
+
+/* Deskripsi */
 
 .field textarea {
-    resize: vertical;
+    width: 100%;
+    height: 88px;
     min-height: 88px;
+
+    padding: 12px 15px;
+
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.45;
+
+    resize: vertical;
+    outline: none;
 }
 
-.field input[aria-invalid=true],
-.field textarea[aria-invalid=true] {
-    border-color: var(--danger);
-    background: #fff9f7;
+.field input::placeholder,
+.field textarea::placeholder {
+    color: var(--muted);
+}
+
+/* Focus */
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+    border-color: var(--blue);
+}
+
+/* Validasi */
+
+.field input[aria-invalid="true"],
+.field textarea[aria-invalid="true"] {
+    border-color: var(--accent);
 }
 
 .field-error {
-    color: var(--danger);
-    font-size: 12px;
+    color: var(--accent);
+    font-size: 14px;
+    margin-top: 2px;
 }
 
-/* FOTO UPLOAD */
+/* ==========================================
+   FOTO BUKTI
+========================================== */
 
 .upload-area {
-    display: grid;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     gap: 8px;
-    cursor: pointer;
+
+    width: 100%;
+    min-height: 106px;
+
     padding: 16px;
-    border: 1px dashed var(--border);
+
     background: var(--canvas);
+
+    border: 1px dashed var(--border);
     border-radius: 10px;
+
     color: var(--accent);
+
+    cursor: pointer;
+}
+
+.upload-area:hover {
+    border-color: var(--accent);
 }
 
 .upload-area.has-error {
-    border-color: var(--danger);
+    border-color: var(--accent);
+}
+
+.upload-area svg {
+    width: 20px;
+    height: 20px;
 }
 
 .upload-area strong {
+    color: var(--accent);
     font-size: 14px;
+    font-weight: 500;
     overflow-wrap: anywhere;
 }
 
 .upload-area small {
-    font-size: 13px;
     color: var(--muted);
+    font-size: 13px;
 }
+
+/* Sembunyikan input file bawaan browser,
+   tetapi tetap bisa dipilih lewat label */
 
 .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    border: 0;
+    position: absolute !important;
+
+    width: 1px !important;
+    height: 1px !important;
+
+    padding: 0 !important;
+    margin: -1px !important;
+
+    overflow: hidden !important;
+
+    clip: rect(0, 0, 0, 0) !important;
+
+    white-space: nowrap !important;
+    border: none !important;
 }
 
-/* BUTTON */
+/* ==========================================
+   TOMBOL
+========================================== */
 
 .actions {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
+    flex-wrap: wrap;
     gap: 12px;
 }
 
 .btn {
-    border-radius: 10px;
-    padding: 14px 20px;
-    min-height: 48px;
-    border: 1px solid transparent;
-    font-size: 14px;
-    font-weight: 600;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+
+    width: max-content;
+    min-height: 48px;
+
+    padding: 12px 20px;
+
+    border: 1px solid transparent;
+    border-radius: 10px;
+
     text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 500;
+
     cursor: pointer;
 }
 
 .btn-primary {
-    background-color: #56061D !important;
-    color: #FFFFFF !important;
-    opacity: 1 !important;
-    border: none;
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
 }
 
 .btn-primary:hover {
-    background-color: #6b1930 !important;
+    background: #70102c;
+    color: white;
 }
 
 .btn-secondary {
-    color: var(--ink);
-    border-color: var(--border);
     background: white;
+    border-color: var(--border);
+    color: var(--ink);
 }
+
+.btn-secondary:hover {
+    background: var(--canvas);
+}
+
+/* Form nonaktif jika belum login sebagai penghuni */
 
 fieldset:disabled {
-    opacity: 0.6;
+    opacity: 0.65;
 }
 
-fieldset:disabled .btn {
+fieldset:disabled button {
     cursor: not-allowed;
 }
 
-/* ALERT DAN KONFIRMASI */
+/* ==========================================
+   VALIDASI DAN HALAMAN SUKSES
+========================================== */
 
 .alert {
     display: flex;
-    gap: 12px;
+    align-items: center;
+    gap: 14px;
+
+    min-height: 54px;
     padding: 16px;
+
     border-radius: 10px;
     font-size: 15px;
-    align-items: flex-start;
 }
 
 .alert svg {
@@ -453,100 +682,129 @@ fieldset:disabled .btn {
 }
 
 .alert-info {
-    color: white;
     background: var(--blue);
-}
-
-.alert-danger {
-    color: #8e302c;
-    background: #fff0ed;
+    color: white;
 }
 
 .alert-warning {
-    color: #81550c;
     background: #fff7dc;
+    color: #81550c;
 }
 
-.alert ul {
-    margin: 8px 0 0;
-    padding-left: 20px;
+.alert-danger {
+    background: #fff0ed;
+    color: #8e302c;
 }
 
 .success-icon {
-    border-radius: 24px;
-    background: #e7eef3;
-    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     width: 64px;
+    height: 64px;
+
+    background: #e5edf1;
     color: var(--blue);
-    display: grid;
-    place-items: center;
+
+    border-radius: 25px;
 }
 
-/* RINGKASAN HUNIAN */
+.result-box {
+    gap: 5px;
+}
+
+/* ==========================================
+   KARTU INFORMASI KOST DI KANAN
+========================================== */
 
 .hunian-card {
+    display: flex;
+    flex-direction: column;
+    gap: 17px;
+
+    min-width: 0;
+
+    background: white;
+
+    border: 1px solid var(--border);
+    border-radius: 16px;
+
     padding: 24px;
-    display: grid;
-    gap: 16px;
 }
 
 .hunian-photo {
-    height: 170px;
     width: 100%;
-    overflow: hidden;
-    border-radius: 16px;
+    height: 170px;
+
     background: #e7ded4;
+
+    border-radius: 16px;
+    overflow: hidden;
 }
 
 .hunian-photo img {
-    height: 100%;
+    display: block;
     width: 100%;
+    height: 100%;
     object-fit: cover;
 }
 
 .photo-placeholder {
     display: flex;
-    height: 100%;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    text-align: center;
+    justify-content: center;
     gap: 10px;
-    padding: 14px;
+
+    width: 100%;
+    height: 100%;
+
+    background: #e6ded3;
     color: var(--muted);
-    background: linear-gradient(140deg, #e2d8cb, #e7eef3);
+
+    text-align: center;
+    padding: 16px;
 }
 
 .hunian-card h2 {
     margin: 0;
+
+    color: var(--ink);
     font-size: 28px;
+    font-weight: 600;
+    line-height: 1.3;
 }
 
 .hunian-card p {
     margin: 0;
-    font-size: 13px;
+
     color: var(--muted);
+    font-size: 13px;
 }
 
-/* RIWAYAT KELUHAN */
+/* ==========================================
+   HALAMAN DAFTAR KELUHAN PENGHUNI
+========================================== */
 
 .table-heading {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 16px;
 }
 
 .table-heading h2 {
-    font-size: 20px;
     margin: 0;
+    font-size: 20px;
+    font-weight: 600;
 }
 
 .empty-state {
     padding: 20px;
     background: var(--canvas);
-    border-radius: 10px;
     color: var(--muted);
+    border-radius: 10px;
 }
 
 .report-list {
@@ -555,13 +813,17 @@ fieldset:disabled .btn {
 }
 
 .report-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    padding: 16px;
+
+    background: white;
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
+
     text-decoration: none;
 }
 
@@ -575,6 +837,7 @@ fieldset:disabled .btn {
 }
 
 .report-row strong {
+    color: var(--ink);
     font-size: 14px;
 }
 
@@ -586,22 +849,31 @@ fieldset:disabled .btn {
 .text-link {
     color: var(--accent);
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     text-decoration: none;
 }
+
+.text-link:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================
+   HALAMAN DETAIL KELUHAN PENGHUNI
+========================================== */
 
 .detail-title {
     margin-top: 4px;
 }
 
 .detail-grid {
-    margin: 0;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 18px;
+
+    margin: 0;
 }
 
-.detail-grid div {
+.detail-grid > div {
     display: grid;
     gap: 8px;
 }
@@ -625,9 +897,12 @@ fieldset:disabled .btn {
     overflow-wrap: anywhere;
 }
 
-/* RESPONSIVE */
+/* ==========================================
+   RESPONSIVE TABLET
+========================================== */
 
 @media (max-width: 1130px) {
+
     .content-grid {
         grid-template-columns: minmax(0, 1fr);
     }
@@ -635,36 +910,43 @@ fieldset:disabled .btn {
     .hunian-card {
         max-width: 540px;
     }
+
 }
 
+/* ==========================================
+   RESPONSIVE MOBILE
+========================================== */
+
 @media (max-width: 780px) {
+
     .dashboard {
         grid-template-columns: 1fr;
     }
 
     .sidebar {
         min-height: auto;
-        padding: 16px;
-        gap: 12px;
+        padding: 18px;
+        gap: 16px;
     }
 
     .sidebar-nav {
-        display: flex;
-        flex-wrap: wrap;
+        flex-direction: row;
     }
 
     .workspace,
     .sidebar-help,
-    .nav-footer {
+    .nav-footer,
+    .sidebar-bottom {
         display: none;
     }
 
     .topbar {
-        height: 66px;
-        padding: 0 16px;
+        height: 68px;
+        padding: 0 18px;
     }
 
-    .topbar-path {
+    .topbar-path,
+    .bell {
         display: none;
     }
 
@@ -673,7 +955,7 @@ fieldset:disabled .btn {
     }
 
     .page-heading h1 {
-        font-size: 23px;
+        font-size: 24px;
     }
 
     .form-grid {
@@ -684,14 +966,21 @@ fieldset:disabled .btn {
         padding: 20px;
     }
 
-    .nav-subitem {
-        margin-left: 0;
+    .detail-grid {
+        grid-template-columns: 1fr;
     }
+
 }
 
-@media (max-width: 420px) {
+@media (max-width: 430px) {
+
     .report-row {
         flex-direction: column;
         align-items: flex-start;
     }
+
+    .actions .btn {
+        width: 100%;
+    }
+
 }
