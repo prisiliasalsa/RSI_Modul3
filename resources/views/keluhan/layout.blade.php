@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -7,22 +8,47 @@
 
     <title>@yield('title', 'Keluhan') | Kost.io</title>
 
-    <link rel="stylesheet"
-          href="{{ asset('assets/kostio/keluhan.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <script src="{{ asset('assets/kostio/keluhan.js') }}"
-            defer></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    @php
+        // CSS khusus UC-08
+        $cssPath = public_path('assets/kostio/keluhan.css');
+
+        $cssVersion = is_file($cssPath)
+            ? filemtime($cssPath)
+            : 1;
+    @endphp
+
+    <link
+        rel="stylesheet"
+        href="{{ asset('assets/kostio/keluhan.css') }}?v={{ $cssVersion }}"
+    >
+
+    <script
+        src="{{ asset('assets/kostio/keluhan.js') }}"
+        defer
+    ></script>
 </head>
 
 <body>
+
 <div class="dashboard">
 
-    <!-- SIDEBAR -->
+    {{-- SIDEBAR PENGHUNI --}}
     <aside class="sidebar">
+
         <div class="brand">
             @include('keluhan.partials.icon', [
-                'name' => 'home', 'size' => 22
+                'name' => 'home',
+                'size' => 20
             ])
+
             <strong>kost.io</strong>
         </div>
 
@@ -31,65 +57,82 @@
             <span>Temukan nyamannya</span>
         </div>
 
-        <nav class="sidebar-nav">
+        <nav class="sidebar-nav" aria-label="Menu penghuni">
+
             <span class="nav-item muted">
                 @include('keluhan.partials.icon', [
                     'name' => 'wallet'
                 ])
-                Tagihan Sewa
+
+                <span>Tagihan Sewa</span>
             </span>
 
-            <a href="{{ route('keluhan.status') }}"
-               class="nav-item {{ request()->routeIs('keluhan.*') ? 'active' : '' }}">
+            <a
+                href="{{ route('keluhan.status') }}"
+                class="nav-item active"
+            >
                 @include('keluhan.partials.icon', [
                     'name' => 'chat'
                 ])
-                Keluhan Saya
+
+                <span>Keluhan Saya</span>
             </a>
 
-            <a href="{{ route('keluhan.ajukan') }}"
-               class="nav-item nav-subitem {{ request()->routeIs('keluhan.ajukan') ? 'selected' : '' }}">
-                Ajukan keluhan
-            </a>
         </nav>
 
         <div class="sidebar-bottom">
+
             <div class="sidebar-help">
                 <strong>Butuh bantuan?</strong>
-                <p>Kelola tempat tinggal dengan lebih tenang.</p>
+
+                <p>
+                    Kelola tempat tinggal dengan lebih tenang.
+                </p>
             </div>
 
-            <div class="nav-item muted nav-footer">
-                <span class="signout-dot"></span>
-                Keluar
+            <div class="nav-footer">
+                @include('keluhan.partials.icon', [
+                    'name' => 'logout'
+                ])
+
+                <span>Keluar</span>
             </div>
+
         </div>
+
     </aside>
 
-    <!-- KONTEN -->
+    {{-- AREA UTAMA --}}
     <div class="main-panel">
 
+        {{-- HEADER --}}
         <header class="topbar">
-            <span class="topbar-path">
-                Kost.io / Penghuni
-            </span>
+
+            <div class="topbar-path">
+                Kost.io <span>/</span> Penghuni
+            </div>
 
             <div class="topbar-user">
+
                 <span class="bell">
                     @include('keluhan.partials.icon', [
                         'name' => 'bell',
-                        'size' => 21
+                        'size' => 22
                     ])
                 </span>
 
                 @php
                     $nama = trim(
-                        (string) ($penghuni->namaLengkap ?? 'Penghuni')
+                        (string) (
+                            $penghuni->namaLengkap ?? 'Penghuni'
+                        )
                     );
 
+                    $kataNama = preg_split('/\s+/', $nama);
+
                     $inisial = implode('', array_map(
-                        fn($kata) => mb_substr($kata, 0, 1),
-                        array_slice(preg_split('/\s+/', $nama), 0, 2)
+                        fn ($kata) => mb_substr($kata, 0, 1),
+                        array_slice($kataNama, 0, 2)
                     ));
                 @endphp
 
@@ -97,24 +140,35 @@
                     {{ strtoupper($inisial ?: 'P') }}
                 </span>
 
-                <span class="user-text">
+                <div class="user-text">
                     <strong>{{ $nama }}</strong>
                     <small>Penghuni</small>
-                </span>
+                </div>
+
             </div>
+
         </header>
 
+        {{-- KONTEN HALAMAN --}}
         <main class="page-content">
+
             <div class="breadcrumb">
                 BERANDA / MENGAJUKAN KELUHAN / KERUSAKAN
             </div>
 
             <div class="page-heading">
+
                 <h1>
-                    @yield('heading', 'Ajukan keluhan / kerusakan')
+                    @yield(
+                        'heading',
+                        'Ajukan keluhan / kerusakan'
+                    )
                 </h1>
 
-                <span class="tag tag-brand">Kost.io</span>
+                <span class="tag tag-brand">
+                    Kost.io
+                </span>
+
             </div>
 
             <p class="page-lead">
@@ -125,14 +179,22 @@
             </p>
 
             <div class="content-grid">
+
+                {{-- FORM / ISI UC-08 --}}
                 <section class="main-card">
                     @yield('content')
                 </section>
 
+                {{-- INFORMASI KOST --}}
                 @include('keluhan.partials.hunian')
+
             </div>
+
         </main>
+
     </div>
+
 </div>
+
 </body>
-</html>php artisan optimize:clear
+</html>
