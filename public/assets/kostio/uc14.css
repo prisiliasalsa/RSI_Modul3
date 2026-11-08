@@ -1,0 +1,994 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --uc14-navy: #022e4a;
+    --uc14-navy-soft: #173e54;
+    --uc14-maroon: #56061d;
+    --uc14-cream: #f5f0ea;
+    --uc14-beige: #e2d8cb;
+    --uc14-blue: #507593;
+    --uc14-muted: #5b6871;
+    --uc14-border: #ded9d2;
+    --uc14-white: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body.owner14 {
+    margin: 0;
+    background: var(--uc14-cream);
+    color: var(--uc14-navy);
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+body.owner14 button,
+body.owner14 input,
+body.owner14 select,
+body.owner14 textarea {
+    font: inherit;
+}
+
+body.owner14 a {
+    text-decoration: none;
+}
+
+/* ========================================
+   LAYOUT UTAMA
+======================================== */
+
+.owner14-shell {
+    display: grid;
+    grid-template-columns: 244px minmax(0, 1fr);
+    min-height: 100vh;
+    background: var(--uc14-cream);
+}
+
+.owner14-workarea {
+    min-width: 0;
+}
+
+/* ========================================
+   SIDEBAR
+======================================== */
+
+.owner14-sidebar {
+    background: var(--uc14-navy);
+    color: white;
+    min-height: 100vh;
+    padding: 32px 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.owner14-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 8px;
+}
+
+.owner14-brand strong {
+    font-size: 27px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    line-height: 1.45;
+}
+
+.owner14-brand svg {
+    flex-shrink: 0;
+}
+
+.owner14-workspace {
+    background: var(--uc14-navy-soft);
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.owner14-workspace small {
+    color: var(--uc14-beige);
+    font-size: 13px;
+    font-weight: 400;
+}
+
+.owner14-workspace span {
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.owner14-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.owner14-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 44px;
+    padding: 12px;
+    border-radius: 10px;
+    color: var(--uc14-beige);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: default;
+}
+
+.owner14-nav-item svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.owner14-nav-item.active,
+.owner14-nav-item.is-active {
+    background: var(--uc14-maroon);
+    color: white;
+    cursor: pointer;
+}
+
+.owner14-nav-item.active:hover,
+.owner14-nav-item.is-active:hover {
+    background: #6d0a27;
+}
+
+.owner14-sidebar-spacer {
+    flex: 1;
+    min-height: 24px;
+}
+
+.owner14-help {
+    background: var(--uc14-navy-soft);
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.owner14-help strong {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.owner14-help p {
+    color: var(--uc14-beige);
+    font-size: 13px;
+    line-height: 1.45;
+    margin: 8px 0 0;
+}
+
+.owner14-logout {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    color: var(--uc14-beige);
+    font-size: 14px;
+}
+
+.owner14-logout svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* ========================================
+   TOPBAR
+======================================== */
+
+.owner14-topbar {
+    width: 100%;
+    height: 80px;
+    background: white;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.owner14-topbar-path,
+.owner14-path {
+    color: var(--uc14-muted);
+    font-size: 13px;
+}
+
+.owner14-topbar-path span,
+.owner14-path span {
+    margin: 0 14px;
+}
+
+.owner14-account {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.owner14-bell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--uc14-muted);
+}
+
+.owner14-avatar {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 50%;
+    background: var(--uc14-beige);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--uc14-maroon);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.owner14-account-text,
+.owner14-user {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 160px;
+}
+
+.owner14-account-text strong,
+.owner14-user strong {
+    color: var(--uc14-navy);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.owner14-account-text small,
+.owner14-user small {
+    color: var(--uc14-muted);
+    font-size: 13px;
+}
+
+/* ========================================
+   KONTEN HALAMAN
+======================================== */
+
+.owner14-content {
+    padding: 40px;
+    width: 100%;
+    min-width: 0;
+}
+
+.owner14-breadcrumb {
+    margin-bottom: 24px;
+    color: var(--uc14-muted);
+    font-size: 13px;
+}
+
+.owner14-breadcrumb span {
+    margin: 0 6px;
+}
+
+.owner14-page-heading,
+.owner14-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.owner14-page-heading h1,
+.owner14-heading h1 {
+    margin: 0;
+    color: var(--uc14-navy);
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
+.owner14-kost-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: max-content;
+    max-width: 100%;
+    padding: 8px 10px;
+    border-radius: 24px;
+    background: var(--uc14-blue);
+    color: white;
+    font-size: 13px;
+    font-weight: 400;
+}
+
+.owner14-description,
+.owner14-subtitle {
+    margin: 20px 0 24px;
+    color: var(--uc14-muted);
+    font-size: 15px;
+}
+
+/* ========================================
+   UI-14.01 — KARTU RINGKASAN
+======================================== */
+
+.owner14-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.owner14-stat-card {
+    background: white;
+    border: 1px solid var(--uc14-border);
+    border-radius: 16px;
+    min-height: 120px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+}
+
+.owner14-stat-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--uc14-muted);
+    font-size: 13px;
+}
+
+.owner14-stat-label svg {
+    color: var(--uc14-maroon);
+    flex-shrink: 0;
+}
+
+.owner14-stat-number {
+    color: var(--uc14-navy);
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+/* ========================================
+   UI-14.01 — TABEL
+======================================== */
+
+.owner14-table-card {
+    background: white;
+    border: 1px solid var(--uc14-border);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.owner14-table-toolbar {
+    min-height: 90px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.owner14-table-toolbar h2 {
+    margin: 0;
+    color: var(--uc14-navy);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.owner14-search {
+    width: 290px;
+    max-width: 100%;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--uc14-cream);
+    border-radius: 10px;
+    padding: 11px 14px;
+}
+
+.owner14-search svg {
+    color: var(--uc14-muted);
+    flex-shrink: 0;
+}
+
+.owner14-search input {
+    width: 100%;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    outline: none;
+    color: var(--uc14-navy);
+    font-size: 13px;
+}
+
+.owner14-search input::placeholder {
+    color: var(--uc14-muted);
+}
+
+.owner14-search:focus-within {
+    outline: 2px solid var(--uc14-blue);
+}
+
+.owner14-table-responsive {
+    overflow-x: auto;
+}
+
+.owner14-table {
+    width: 100%;
+    min-width: 780px;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.owner14-table thead {
+    background: var(--uc14-cream);
+}
+
+.owner14-table th {
+    color: var(--uc14-muted);
+    font-size: 13px;
+    font-weight: 400;
+    text-align: left;
+    padding: 16px 24px;
+}
+
+.owner14-table td {
+    height: 70px;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--uc14-border);
+    color: var(--uc14-muted);
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.owner14-table th:nth-child(1) {
+    width: 27%;
+}
+
+.owner14-table th:nth-child(2) {
+    width: 23%;
+}
+
+.owner14-table th:nth-child(3) {
+    width: 18%;
+}
+
+.owner14-table th:nth-child(4) {
+    width: 18%;
+}
+
+.owner14-table th:nth-child(5) {
+    width: 14%;
+}
+
+.owner14-report-link {
+    color: var(--uc14-navy);
+    font-weight: 500;
+}
+
+.owner14-report-link:hover {
+    text-decoration: underline;
+}
+
+.owner14-detail-link {
+    color: var(--uc14-maroon);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.owner14-detail-link:hover {
+    text-decoration: underline;
+}
+
+.owner14-status {
+    display: inline-flex;
+    border-radius: 24px;
+    padding: 8px 10px;
+    background: var(--uc14-beige);
+    color: var(--uc14-maroon);
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.owner14-status-selesai {
+    background: #e4edf2;
+    color: var(--uc14-blue);
+}
+
+.owner14-empty {
+    padding: 32px !important;
+    text-align: center;
+}
+
+.owner14-table-footer {
+    min-height: 68px;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    color: var(--uc14-muted);
+    font-size: 13px;
+}
+
+.owner14-pagination {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.owner14-pagination a {
+    color: var(--uc14-navy);
+}
+
+.owner14-pagination .disabled {
+    color: #9ba4a8;
+}
+
+.owner14-pagination .current {
+    color: var(--uc14-navy);
+}
+
+/* ========================================
+   TOMBOL
+======================================== */
+
+.owner14-btn-primary,
+.owner14-btn-secondary,
+.owner14-primary,
+.owner14-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: max-content;
+    min-height: 48px;
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+}
+
+.owner14-btn-primary,
+.owner14-primary {
+    background: var(--uc14-maroon);
+    border: 1px solid var(--uc14-maroon);
+    color: white !important;
+}
+
+.owner14-btn-primary:hover,
+.owner14-primary:hover {
+    background: #700b29;
+}
+
+.owner14-btn-secondary,
+.owner14-secondary {
+    background: white;
+    border: 1px solid var(--uc14-border);
+    color: var(--uc14-navy) !important;
+}
+
+.owner14-btn-secondary:hover,
+.owner14-secondary:hover {
+    background: var(--uc14-cream);
+}
+
+.owner14-bottom-button {
+    margin-top: 24px;
+}
+
+/* ========================================
+   UI-14.02 — DETAIL KELUHAN
+======================================== */
+
+.owner14-detail-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 330px;
+    gap: 24px;
+    align-items: start;
+}
+
+.owner14-detail-card,
+.owner14-residence-card {
+    background: white;
+    border: 1px solid var(--uc14-border);
+    border-radius: 16px;
+    min-width: 0;
+}
+
+.owner14-detail-card {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 27px;
+}
+
+.owner14-report-box {
+    background: var(--uc14-beige);
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.owner14-report-box strong {
+    color: var(--uc14-navy);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.owner14-report-box p {
+    margin: 0;
+    color: var(--uc14-muted);
+    font-size: 15px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.owner14-existing-info {
+    background: #f5f0ea;
+    border-radius: 10px;
+    padding: 16px;
+}
+
+.owner14-existing-info strong {
+    display: block;
+    color: var(--uc14-navy);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.owner14-existing-info p {
+    margin: 5px 0 12px;
+    color: var(--uc14-muted);
+    font-size: 14px;
+    white-space: pre-wrap;
+}
+
+.owner14-existing-info p:last-child {
+    margin-bottom: 0;
+}
+
+.owner14-detail-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.owner14-field {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.owner14-field label {
+    color: var(--uc14-navy);
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.owner14-field textarea,
+.owner14-field select {
+    width: 100%;
+    border: 1px solid var(--uc14-border);
+    border-radius: 10px;
+    background: white;
+    color: var(--uc14-navy);
+    padding: 12px 14px;
+    font-size: 15px;
+    outline: none;
+}
+
+.owner14-field textarea {
+    min-height: 86px;
+    height: 86px;
+    resize: vertical;
+}
+
+.owner14-field select {
+    height: 44px;
+    cursor: pointer;
+}
+
+.owner14-field textarea:focus,
+.owner14-field select:focus {
+    border-color: var(--uc14-blue);
+}
+
+.owner14-button-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.owner14-error {
+    background: #fff0ed;
+    color: #9a2b35;
+    padding: 14px 16px;
+    border-radius: 10px;
+}
+
+/* ========================================
+   INFORMASI KOST DI SEBELAH KANAN
+======================================== */
+
+.owner14-residence-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 17px;
+}
+
+.owner14-residence-photo {
+    width: 100%;
+    height: 170px;
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--uc14-beige);
+}
+
+.owner14-residence-photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.owner14-photo-empty,
+.owner14-photo-placeholder {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    background: #e8e0d6;
+    color: var(--uc14-muted);
+    text-align: center;
+    font-size: 13px;
+    padding: 16px;
+}
+
+.owner14-residence-card h2 {
+    margin: 0;
+    color: var(--uc14-navy);
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.owner14-residence-card p {
+    margin: 0;
+    color: var(--uc14-muted);
+    font-size: 13px;
+}
+
+/* ========================================
+   UI-14.04 — STATUS DIPERBARUI
+======================================== */
+
+.owner14-success-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 25px;
+    background: #e5edf1;
+    color: var(--uc14-blue);
+}
+
+.owner14-success-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--uc14-blue);
+    color: white;
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 15px;
+}
+
+/* ========================================
+   UI-14.03 — TANGGAPAN PENGHUNI
+   Mempertahankan kelas Blade yang sudah ada
+======================================== */
+
+.uc14-resident-card {
+    gap: 20px;
+}
+
+.uc14-resident-summary {
+    background: var(--uc14-beige);
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.uc14-resident-summary strong {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.uc14-resident-summary p {
+    margin: 0;
+    color: var(--uc14-muted);
+    font-size: 15px;
+}
+
+.uc14-response-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.uc14-response-form label,
+.uc14-response-block strong {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.uc14-response-form textarea {
+    width: 100%;
+    min-height: 90px;
+    padding: 14px;
+    border: 1px solid var(--uc14-border);
+    border-radius: 10px;
+    color: var(--uc14-navy);
+    resize: vertical;
+    outline: none;
+}
+
+.uc14-response-block {
+    padding: 16px;
+    border-radius: 10px;
+    background: #f5f0ea;
+}
+
+.uc14-response-block p {
+    margin: 8px 0 0;
+    white-space: pre-wrap;
+}
+
+.uc14-response-note {
+    margin: 0;
+    color: var(--uc14-muted);
+    font-size: 14px;
+}
+
+.owner14-field-error {
+    color: #a12d32;
+    font-size: 13px;
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 1100px) {
+
+    .owner14-content {
+        padding: 30px;
+    }
+
+    .owner14-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .owner14-residence-card {
+        max-width: 440px;
+    }
+
+    .owner14-account-text,
+    .owner14-user {
+        min-width: 100px;
+    }
+}
+
+@media (max-width: 760px) {
+
+    .owner14-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .owner14-sidebar {
+        min-height: auto;
+        padding: 18px;
+        gap: 16px;
+    }
+
+    .owner14-nav {
+        flex-direction: row;
+        overflow-x: auto;
+    }
+
+    .owner14-nav-item {
+        width: auto;
+        min-width: max-content;
+    }
+
+    .owner14-sidebar-spacer,
+    .owner14-help,
+    .owner14-logout {
+        display: none;
+    }
+
+    .owner14-topbar {
+        height: 68px;
+    }
+
+    .owner14-topbar-path,
+    .owner14-path,
+    .owner14-bell {
+        display: none;
+    }
+
+    .owner14-content {
+        padding: 24px 16px;
+    }
+
+    .owner14-page-heading h1,
+    .owner14-heading h1 {
+        font-size: 24px;
+    }
+
+    .owner14-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .owner14-table-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .owner14-search {
+        width: 100%;
+    }
+
+    .owner14-detail-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .owner14-detail-card {
+        padding: 20px;
+    }
+}
+
+/* Menu navigasi yang bisa diklik */
+.owner14-nav-item[href] {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+/* Efek hover pada menu */
+.owner14-nav-item[href]:hover {
+    background: #173e54;
+    color: white;
+}
+
+/* Menu yang sedang aktif */
+.owner14-nav-item.active,
+.owner14-nav-item.is-active {
+    background: #56061d;
+    color: white;
+}
+
+/* Menu aktif tetap merah saat hover */
+.owner14-nav-item.active:hover,
+.owner14-nav-item.is-active:hover {
+    background: #56061d;
+}
