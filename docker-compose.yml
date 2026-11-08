@@ -1,0 +1,14 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql-kostio
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: kostio
+    ports:
+      - "3307:3306"
+    volumes:
+      - kostio-data:/var/lib/mysql
+
+volumes:
+  kostio-data:
