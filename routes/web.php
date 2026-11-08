@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RegistrasiController;
 use App\Http\Controllers\KamarController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
@@ -8,6 +9,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/registrasi', [RegistrasiController::class, 'pilihMenuRegistrasi'])->name('registrasi.form');
+Route::post('/registrasi', [RegistrasiController::class, 'klikDaftar'])->name('registrasi.simpan');
+Route::get('/registrasi/berhasil', [RegistrasiController::class, 'halamanBerhasil'])->name('registrasi.berhasil');
+Route::get('/registrasi/masuk', [RegistrasiController::class, 'arahkanKeHalamanLogin'])->name('registrasi.login');
+
+require __DIR__ . '/keluhan.php';
 // UC-02 login
 Route::get('/login', [LoginController::class, 'pilihMenuLogin'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.proses');
