@@ -1,10 +1,4 @@
 
--- Kost.io | Database Schema (11 Tabel)
--- Acuan pemodelan data Modul 2
--- Nama tabel huruf kecil agar sesuai dengan Laravel UC-08.
--- Gunakan untuk dokumentasi / instalasi baru.
--- Jangan jalankan ulang pada database yang sudah berisi data
--- tanpa memeriksa struktur tabel yang ada.
 
 USE `kost_io`;
 
