@@ -72,13 +72,33 @@
                 Verifikasi Pembayaran
             </span>
 
-            <a
-                class="finance-nav-link"
-                href="{{ route('pemilik.keluhan.daftar') }}"
-            >
-                @include('keluhan.pemilik.icon', ['name' => 'chat'])
-                Keluhan / Kerusakan
-            </a>
+            
+            {{-- UC-14: Keluhan / Kerusakan --}}
+            @if (\Illuminate\Support\Facades\Route::has('pemilik.keluhan.daftar'))
+
+                <a
+                    class="finance-nav-link"
+                    href="{{ route('pemilik.keluhan.daftar') }}"
+                >
+                    @include('keluhan.pemilik.icon', [
+                        'name' => 'chat'
+                    ])
+
+                    Keluhan / Kerusakan
+                </a>
+
+            @else
+
+                <span class="finance-nav-link">
+                    @include('keluhan.pemilik.icon', [
+                        'name' => 'chat'
+                    ])
+
+                    Keluhan / Kerusakan
+                </span>
+
+            @endif
+
 
             <a
                 class="finance-nav-link selected"
