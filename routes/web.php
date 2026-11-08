@@ -7,3 +7,6 @@ Route::get('/', function () {
 });
 
 require __DIR__ . '/keluhan.php';
+
+// UC-15: Laporan keuangan pemilik kost
+require __DIR__ . '/keuangan.php';
