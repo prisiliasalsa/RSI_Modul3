@@ -1,3 +1,4 @@
+
 @extends('keluhan.layout')
 
 @section(
@@ -6,7 +7,7 @@
         ? 'Laporan berhasil dikirim'
         : ($errors->any()
             ? 'Lengkapi data keluhan'
-            : 'Ajukan Keluhan')
+            : 'Ajukan keluhan / kerusakan')
 )
 
 @section(
@@ -22,7 +23,7 @@
 
 @if ($berhasil)
 
-    {{-- UI-08.03: Laporan berhasil dikirim --}}
+    {{-- UI-08.03: LAPORAN BERHASIL DIKIRIM --}}
 
     <div class="success-icon">
         @include('keluhan.partials.icon', [
@@ -32,115 +33,142 @@
     </div>
 
     <div class="alert alert-info" role="status">
+
         @include('keluhan.partials.icon', [
-            'name' => 'bell'
+            'name' => 'bell',
+            'size' => 20
         ])
 
         <span>
             Laporan berhasil dikirim kepada pemilik kost.
         </span>
+
     </div>
 
     <div class="residence-highlight result-box">
+
         <strong>
-            KLH-{{ str_pad($berhasil['idKeluhan'], 3, '0', STR_PAD_LEFT) }}
-            · {{ $berhasil['judul'] }}
+            KLH-{{ str_pad(
+                $berhasil['idKeluhan'],
+                3,
+                '0',
+                STR_PAD_LEFT
+            ) }}
+            ·
+            {{ $berhasil['judul'] }}
         </strong>
 
-        <p>Status: {{ $berhasil['status'] }}</p>
-        <p>Lokasi: {{ $berhasil['lokasi'] }}</p>
+        <p>
+            Status: {{ $berhasil['status'] }}
+        </p>
 
         <p>
             Foto:
             {{ $berhasil['foto']
-                ? 'Dilampirkan'
-                : 'Tidak dilampirkan' }}.
+                ? 'dilampirkan'
+                : 'tidak dilampirkan'
+            }}.
             Pemilik akan memperbarui status penanganan.
         </p>
+
     </div>
 
     <div class="actions">
-        <a href="{{ route('keluhan.detail', $berhasil['idKeluhan']) }}"
-           class="btn btn-primary">
+
+        <a
+            href="{{ route('keluhan.detail', $berhasil['idKeluhan']) }}"
+            class="btn btn-primary"
+        >
             Lihat status keluhan
         </a>
 
-        <a href="{{ route('keluhan.ajukan') }}"
-           class="btn btn-secondary">
+        <a
+            href="{{ route('keluhan.ajukan') }}"
+            class="btn btn-secondary"
+        >
             Ajukan laporan lain
         </a>
+
     </div>
 
 @else
 
-    {{-- UI-08.01: Form pengajuan keluhan --}}
+    {{-- UI-08.01 / UI-08.02: FORM PENGAJUAN --}}
 
-    @if (!$penghuni)
-        <div class="alert alert-warning" role="status">
+    @if ($errors->any())
+
+        <div class="alert alert-info" role="alert">
+
             @include('keluhan.partials.icon', [
-                'name' => 'info'
+                'name' => 'bell',
+                'size' => 20
             ])
 
             <span>
-                Silakan masuk sebagai penghuni dengan sewa aktif.
-                Formulir akan aktif setelah login penghuni
-                terhubung dengan sistem.
+                Data keluhan belum lengkap.
             </span>
+
         </div>
-    @else
+
+    @elseif ($penghuni)
+
         <div class="residence-highlight">
+
             <strong>
                 {{ $penghuni->namaKost ?? 'Kost' }}
-                · Kamar {{ $penghuni->nomorKamar ?? '—' }}
+                ·
+                Kamar {{ $penghuni->nomorKamar ?? '-' }}
             </strong>
 
-            <p>Laporan akan dikirim kepada pemilik kost.</p>
+            <p>
+                Laporan akan dikirim kepada pemilik kost.
+            </p>
+
         </div>
-    @endif
 
-    {{-- UI-08.02: Data tidak lengkap / foto tidak valid --}}
+    @else
 
-    @if ($errors->any())
-        <div class="alert alert-danger" role="alert">
+        <div class="alert alert-warning">
+
             @include('keluhan.partials.icon', [
-                'name' => 'alert'
+                'name' => 'info',
+                'size' => 20
             ])
 
-            <div>
-                <strong>
-                    Data keluhan belum lengkap atau tidak sesuai.
-                </strong>
+            <span>
+                Silakan login sebagai penghuni dengan sewa aktif
+                untuk mengirim laporan.
+            </span>
 
-                <ul>
-                    @foreach ($errors->all() as $pesan)
-                        <li>{{ $pesan }}</li>
-                    @endforeach
-                </ul>
-            </div>
         </div>
+
     @endif
 
-    <form method="POST"
-          action="{{ route('keluhan.simpan') }}"
-          enctype="multipart/form-data"
-          novalidate>
+    <form
+        method="POST"
+        action="{{ route('keluhan.simpan') }}"
+        enctype="multipart/form-data"
+        novalidate
+        class="keluhan-form"
+    >
 
         @csrf
 
         <fieldset @disabled(!$penghuni)>
 
+            {{-- BARIS JUDUL DAN LOKASI --}}
             <div class="form-grid">
 
-                <!-- Judul keluhan -->
                 <div class="field">
+
                     <label for="judul">
                         Judul / jenis keluhan <span>*</span>
                     </label>
 
                     <input
+                        type="text"
                         id="judul"
                         name="judul"
-                        type="text"
                         maxlength="120"
                         value="{{ old('judul') }}"
                         placeholder="Contoh: Keran kamar mandi bocor"
@@ -153,18 +181,19 @@
                             {{ $message }}
                         </small>
                     @enderror
+
                 </div>
 
-                <!-- Lokasi kerusakan -->
                 <div class="field">
+
                     <label for="lokasi">
                         Lokasi kerusakan <span>*</span>
                     </label>
 
                     <input
+                        type="text"
                         id="lokasi"
                         name="lokasi"
-                        type="text"
                         maxlength="120"
                         value="{{ old('lokasi') }}"
                         placeholder="Contoh: Kamar mandi lantai 1"
@@ -177,11 +206,14 @@
                             {{ $message }}
                         </small>
                     @enderror
+
                 </div>
+
             </div>
 
-            <!-- Deskripsi keluhan -->
+            {{-- DESKRIPSI --}}
             <div class="field">
+
                 <label for="deskripsi">
                     Deskripsi keluhan <span>*</span>
                 </label>
@@ -201,20 +233,24 @@
                         {{ $message }}
                     </small>
                 @enderror
+
             </div>
 
-            <!-- Upload foto bukti -->
+            {{-- FOTO BUKTI --}}
             <div class="field">
+
                 <label for="foto">
                     Foto bukti (opsional)
                 </label>
 
                 <label
-                    class="upload-area {{ $errors->has('foto') ? 'has-error' : '' }}"
                     for="foto"
+                    class="upload-area {{ $errors->has('foto') ? 'has-error' : '' }}"
                 >
+
                     @include('keluhan.partials.icon', [
-                        'name' => 'upload'
+                        'name' => 'upload',
+                        'size' => 20
                     ])
 
                     <strong id="upload-caption">
@@ -224,13 +260,14 @@
                     <small>
                         JPG atau PNG · maksimal 2 MB
                     </small>
+
                 </label>
 
                 <input
-                    class="visually-hidden"
                     id="foto"
                     name="foto"
                     type="file"
+                    class="visually-hidden"
                     accept="image/jpeg,image/png"
                     aria-describedby="upload-caption"
                     data-file-input
@@ -241,18 +278,26 @@
                         {{ $message }}
                     </small>
                 @enderror
+
             </div>
 
-            <!-- Tombol submit -->
+            {{-- TOMBOL SUBMIT --}}
             <div class="actions">
-                <button type="submit" class="btn btn-primary">
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
                     {{ $errors->any()
                         ? 'Lengkapi laporan'
-                        : 'Kirim laporan' }}
+                        : 'Kirim laporan'
+                    }}
                 </button>
+
             </div>
 
         </fieldset>
+
     </form>
 
 @endif
