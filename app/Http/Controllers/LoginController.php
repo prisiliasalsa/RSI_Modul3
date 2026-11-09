@@ -2,72 +2,202 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
-    // pilihMenuLogin()
+    // UC-02: Menampilkan halaman login
     public function pilihMenuLogin()
     {
         return view('auth.login');
     }
 
-    // tampilkanHalamanLogin()
     public function tampilkanHalamanLogin()
     {
-        return view('auth.login');
+        return $this->pilihMenuLogin();
     }
 
-    // login(email, kataSandi)
+    // UC-02: Memeriksa akun dan membuat sesi login
     public function login(Request $request)
     {
-        $email = trim((string) $request->input('email'));
-        $kataSandi = (string) $request->input('kata_sandi');
+        $email = strtolower(trim(
+            (string) $request->input('email', '')
+        ));
 
-        // validasiKelengkapan(email, kataSandi)
-        $status = $this->validasiKelengkapan($email, $kataSandi);
+        $kataSandi = (string) $request->input(
+            'kata_sandi', ''
+        );
+
+        $peran = (string) $request->input(
+            'peran', ''
+        );
+
+        // Validasi kelengkapan
+        $status = $this->validasiKelengkapan(
+            $email,
+            $kataSandi
+        );
+
         if ($status !== 'valid') {
-            return back()->withInput($request->only('email'))->with('error', $status);
+            return back()
+                ->withInput($request->only('email', 'peran'))
+                ->with('error', $status);
         }
 
-        // Akun.getAkunByEmail(email)
+        // Validasi pilihan peran
+        if (!in_array(
+            $peran,
+            ['Calon Penghuni', 'Penghuni', 'Pemilik Kost'],
+            true
+        )) {
+            return back()
+                ->withInput($request->only('email', 'peran'))
+                ->with('error', 'Silakan pilih peran login yang valid.');
+        }
+
         try {
-            $dataAkun = User::where('email', $email)->first();
+            // Mengambil akun dari tabel akun
+            $dataAkun = DB::table('akun')
+                ->where('email', $email)
+                ->first();
+
+            if (!$dataAkun) {
+                return back()
+                    ->withInput($request->only('email', 'peran'))
+                    ->with(
+                        'error',
+                        'Akun belum terdaftar, silakan registrasi'
+                    )
+                    ->with('tampilkanRegistrasi', true);
+            }
+
+            // Memeriksa kata sandi
+            if (!$this->cocokkanKataSandi(
+                $kataSandi,
+                $dataAkun
+            )) {
+                return back()
+                    ->withInput($request->only('email', 'peran'))
+                    ->with(
+                        'error',
+                        'Email atau kata sandi tidak sesuai'
+                    );
+            }
+
+            $jenisAkun = (string) $dataAkun->jenisAkun;
+            $penghuniAktif = null;
+
+            // Pemeriksaan peran pemilik kost
+            if (
+                $peran === 'Pemilik Kost' &&
+                $jenisAkun !== 'Pemilik Kost'
+            ) {
+                return back()
+                    ->withInput($request->only('email', 'peran'))
+                    ->with(
+                        'error',
+                        'Akun ini bukan akun pemilik kost.'
+                    );
+            }
+
+            // Pemeriksaan peran calon penghuni
+            if (
+                $peran === 'Calon Penghuni' &&
+                $jenisAkun !== 'Calon Penghuni'
+            ) {
+                return back()
+                    ->withInput($request->only('email', 'peran'))
+                    ->with(
+                        'error',
+                        'Akun ini tidak terdaftar sebagai calon penghuni.'
+                    );
+            }
+
+            // Pemeriksaan peran penghuni
+            if ($peran === 'Penghuni') {
+                if (!in_array(
+                    $jenisAkun,
+                    ['Calon Penghuni', 'Penghuni'],
+                    true
+                )) {
+                    return back()
+                        ->withInput($request->only('email', 'peran'))
+                        ->with(
+                            'error',
+                            'Akun ini bukan akun penghuni.'
+                        );
+                }
+
+                // Memastikan akun memiliki hunian aktif
+                $penghuniAktif = DB::table('penghuni')
+                    ->where('idAkun', $dataAkun->idAkun)
+                    ->where('status', 'Aktif')
+                    ->orderByDesc('idPenghuni')
+                    ->first(['idPenghuni']);
+
+                if (!$penghuniAktif) {
+                    return back()
+                        ->withInput($request->only('email', 'peran'))
+                        ->with(
+                            'error',
+                            'Akun belum memiliki data penghuni aktif.'
+                        );
+                }
+            }
+
+            // Membersihkan sesi login sebelumnya
+            $request->session()->forget([
+                'idAkun',
+                'idPenghuni',
+                'jenisAkun'
+            ]);
+
+            // Mengganti ID sesi setelah login
+            $request->session()->regenerate();
+
+            // Menyimpan identitas akun
+            $request->session()->put(
+                'idAkun',
+                (int) $dataAkun->idAkun
+            );
+
+            $request->session()->put(
+                'jenisAkun',
+                $peran
+            );
+
+            // Menyimpan ID penghuni jika relevan
+            if ($penghuniAktif) {
+                $request->session()->put(
+                    'idPenghuni',
+                    (int) $penghuniAktif->idPenghuni
+                );
+            }
+
+            // Mengarahkan sesuai peran
+            return $this->arahkanKeHalamanUtama(
+                $peran
+            );
+
         } catch (\Throwable $e) {
-            return back()->withInput($request->only('email'))
-                ->with('error', 'Login tidak dapat dilakukan, silakan coba kembali');
+            report($e);
+
+            return back()
+                ->withInput($request->only('email', 'peran'))
+                ->with(
+                    'error',
+                    'Login tidak dapat dilakukan, silakan coba kembali.'
+                );
         }
-
-        // Akun belum terdaftar
-        if (!$dataAkun) {
-            return back()->withInput($request->only('email'))
-                ->with('error', 'Akun belum terdaftar, silakan registrasi')
-                ->with('tampilkanRegistrasi', true);
-        }
-
-        // cocokkanKataSandi(kataSandi, dataAkun)
-        if (!$this->cocokkanKataSandi($kataSandi, $dataAkun)) {
-            return back()->withInput($request->only('email'))
-                ->with('error', 'Email atau kata sandi tidak sesuai');
-        }
-
-        // buatSesiLogin()
-        Auth::login($dataAkun);
-        $request->session()->regenerate();
-
-        // getJenisAkun(email)
-        $jenisAkun = $this->getJenisAkun($email);
-
-        // arahkanKeHalamanUtama(jenisAkun)
-        return $this->arahkanKeHalamanUtama($jenisAkun);
     }
 
-    // validasiKelengkapan(email, kataSandi): mengembalikan "valid" atau pesan error
-    public function validasiKelengkapan(string $email, string $kataSandi): string
-    {
+    // Memvalidasi email dan kata sandi
+    public function validasiKelengkapan(
+        string $email,
+        string $kataSandi
+    ): string {
         if ($email === '' || $kataSandi === '') {
             return 'Email atau kata sandi wajib diisi';
         }
@@ -79,38 +209,80 @@ class LoginController extends Controller
         return 'valid';
     }
 
-    // cocokkanKataSandi(kataSandi, dataAkun)
-    public function cocokkanKataSandi(string $kataSandi, User $dataAkun): bool
-    {
-        return Hash::check($kataSandi, $dataAkun->password);
+    // Memeriksa kata sandi yang sudah di-hash
+    public function cocokkanKataSandi(
+        string $kataSandi,
+        object $dataAkun
+    ): bool {
+        return Hash::check(
+            $kataSandi,
+            (string) ($dataAkun->kataSandi ?? '')
+        );
     }
 
-    // getJenisAkun(email)
+    // Mengambil jenis akun
     public function getJenisAkun(string $email): string
     {
-        $akun = User::where('email', $email)->first();
-
-        return $akun->jenis_akun ?? 'Calon Penghuni';
+        return (string) (
+            DB::table('akun')
+                ->where('email', $email)
+                ->value('jenisAkun') ?? ''
+        );
     }
 
-    // arahkanKeHalamanUtama(jenisAkun)
-    public function arahkanKeHalamanUtama(string $jenisAkun)
-    {
-        // tampilkanHalamanUtama(jenisAkun)
-        return match ($jenisAkun) {
-            'Pemilik Kost' => redirect('/kost'),
-            'Penghuni' => redirect('/penghuni'),
-            default => redirect('/cari-kost'),
-        };
+    // Mengarahkan pengguna berdasarkan perannya
+    public function arahkanKeHalamanUtama(
+        string $jenisAkun
+    ) {
+        if ($jenisAkun === 'Pemilik Kost') {
+
+            // Mengambil kost milik akun yang login
+            $idKost = DB::table('kost')
+                ->where(
+                    'idPemilik',
+                    session('idAkun')
+                )
+                ->orderBy('idKost')
+                ->value('idKost');
+
+            if ($idKost) {
+                return redirect()->route(
+                    'kamar.index',
+                    ['idKost' => $idKost]
+                );
+            }
+
+            return redirect()->route(
+                'pemilik.keuangan.index'
+            );
+        }
+
+        if ($jenisAkun === 'Penghuni') {
+            return redirect()->route(
+                'keluhan.status'
+            );
+        }
+
+        // UC-03 masih dalam pengembangan
+        return redirect('/')
+            ->with(
+                'info',
+                'Login berhasil. Fitur pencarian kost masih dalam pengembangan.'
+            );
     }
 
-    // tampilkanOpsiRegistrasi()
+    // Mengarahkan pengguna ke registrasi
     public function tampilkanOpsiRegistrasi()
     {
-        return redirect()->route('register')->with('info', 'Silakan daftar akun baru');
+        return redirect()
+            ->route('registrasi.form')
+            ->with(
+                'info',
+                'Silakan daftar akun baru'
+            );
     }
 
-    // tampilkanPesan(pesan)
+    // Menampilkan pesan kesalahan
     public function tampilkanPesan(string $pesan)
     {
         return back()->with('error', $pesan);

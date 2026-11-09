@@ -3,15 +3,23 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+<<<<<<< HEAD
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+=======
+>>>>>>> 45d198cfe6d66fa145caf23538412b886c6f95d1
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
 /**
+<<<<<<< HEAD
  * Model Kost untuk UC-09 dan UC-10.
  * Menggunakan nama kolom sesuai schema.sql.
+=======
+ * <<entity>> Kost (CD-09), memakai tabel `kost` pada database/schema.sql.
+ * idKost bukan AUTO_INCREMENT, jadi id berikutnya dihitung di simpanDraft().
+>>>>>>> 45d198cfe6d66fa145caf23538412b886c6f95d1
  */
 class Kost extends Model
 {

@@ -516,11 +516,33 @@ class KontrolKelolaKost extends Controller
         return redirect()->route('kost.daftar', $uji)->with('berhasil', self::PESAN_PUBLIKASI_BERHASIL);
     }
 
-    /** "Kelola Kamar" dan "Tambah kamar": membuka halaman kamar milik anggota lain (/kelola-kamar). */
-    public function bukaKamar(Request $request, int $idKost): RedirectResponse
-    {
-        return redirect('/kelola-kamar?idKost=' . $idKost);
+    
+    /**
+     * UC-09 ke UC-10:
+     * Membuka halaman pengelolaan kamar
+     * berdasarkan kost milik pemilik.
+     */
+    public function bukaKamar(
+        Request $request,
+        int $idKost
+    ): RedirectResponse {
+
+        // Mengambil ID pemilik dari sesi login
+        $idPemilik = $this->idPemilikAktif($request);
+
+        if ($idPemilik === null) {
+            return redirect()->route('login');
+        }
+
+        // Memastikan kost benar-benar milik pemilik
+        $this->kostMilik($idKost, $idPemilik);
+
+        // Menghubungkan UC-09 ke UC-10
+        return redirect()->route('kamar.index', [
+            'idKost' => $idKost
+        ]);
     }
+
 
     // ---------- Pembantu ----------
 
