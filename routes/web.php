@@ -6,6 +6,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegistrasiController;
 use Illuminate\Support\Facades\Route;
 
+// Halaman utama
 Route::get('/', function () {
     return view('welcome');
 });
@@ -37,6 +38,8 @@ Route::delete('/kost/{idKost}/kamar/{idKamar}', [KamarController::class, 'konfir
 // Fitur teman (keluhan, keuangan, dll.)
 require __DIR__ . '/keluhan.php';
 require __DIR__ . '/keluhan-pemilik.php';
+
+// UC-15: Laporan Keuangan
 require __DIR__ . '/keuangan.php';
 
 // UC-09: Mengelola dan Publikasi Data Kost
