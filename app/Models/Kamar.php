@@ -7,20 +7,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Model Kamar untuk integrasi UC-09 dan UC-10.
- * Menggunakan struktur database/schema.sql.
+ * <<entity>> Kamar (CD-09), memakai tabel `kamar` pada database/schema.sql.
+ * Di UC-09 dipakai untuk menghitung kamar sebelum kost dipublikasikan.
  */
 class Kamar extends Model
 {
     protected $table = 'kamar';
     protected $primaryKey = 'idKamar';
-
-    // idKamar sudah AUTO_INCREMENT di MySQL
-    public $incrementing = true;
+    public $incrementing = false;
     protected $keyType = 'int';
     public $timestamps = false;
 
     protected $fillable = [
+        'idKamar',
         'idKost',
         'nomorKamar',
         'tipeKamar',
@@ -31,41 +30,36 @@ class Kamar extends Model
         'statusKamar',
     ];
 
-    /**
-     * UC-10: Relasi kamar dengan kost.
-     */
     public function kost(): BelongsTo
     {
-        return $this->belongsTo(
-            Kost::class,
-            'idKost',
-            'idKost'
-        );
+        return $this->belongsTo(Kost::class, 'idKost', 'idKost');
     }
 
-    /**
-     * UC-09: Menghitung jumlah kamar dalam kost.
-     * Digunakan sebelum mempublikasikan kost.
-     */
+    /** cekKamar(idKost): jumlah kamar milik kost (jumlahKamar). */
     public static function cekKamar(int $idKost): int
     {
-        return DB::table('kamar')
-            ->where('idKost', $idKost)
-            ->count();
+        return DB::table('kamar')->where('idKost', $idKost)->count();
     }
 
-    /**
-     * UC-09: Mengambil status kamar berdasarkan ID.
-     * Mengembalikan null jika kamar tidak ditemukan.
-     */
+    /** cekKamarTerisi(idKamar): status kamar (statusKamar), null jika kamar tidak ditemukan. */
     public static function cekKamarTerisi(int $idKamar): ?string
     {
-        $status = DB::table('kamar')
-            ->where('idKamar', $idKamar)
-            ->value('statusKamar');
+        $status = DB::table('kamar')->where('idKamar', $idKamar)->value('statusKamar');
 
-        return $status === null
-            ? null
-            : (string) $status;
+        return $status === null ? null : (string) $status;
+    }
+
+    /** ubahStatus(idKamar, status) pada CD-12: dipakai saat sewa diakhiri. */
+    public static function ubahStatus(int $idKamar, string $status): bool
+    {
+        if (!DB::table('kamar')->where('idKamar', $idKamar)->exists()) {
+            return false;
+        }
+
+        DB::table('kamar')
+            ->where('idKamar', $idKamar)
+            ->update(['statusKamar' => $status]);
+
+        return true;
     }
 }
