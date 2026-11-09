@@ -27,3 +27,6 @@ require __DIR__ . '/keluhan-pemilik.php';
 
 // UC-15: Laporan Keuangan Pemilik
 require __DIR__ . '/keuangan.php';
+
+// UC-09: Mengelola dan Publikasi Data Kost
+require __DIR__ . '/kelola-kost.php';
