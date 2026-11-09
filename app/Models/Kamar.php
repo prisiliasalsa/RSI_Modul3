@@ -48,4 +48,18 @@ class Kamar extends Model
 
         return $status === null ? null : (string) $status;
     }
+
+    /** ubahStatus(idKamar, status) pada CD-12: dipakai saat sewa diakhiri. */
+    public static function ubahStatus(int $idKamar, string $status): bool
+    {
+        if (!DB::table('kamar')->where('idKamar', $idKamar)->exists()) {
+            return false;
+        }
+
+        DB::table('kamar')
+            ->where('idKamar', $idKamar)
+            ->update(['statusKamar' => $status]);
+
+        return true;
+    }
 }
