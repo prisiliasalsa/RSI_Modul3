@@ -1,20 +1,26 @@
 <?php
 
-use App\Http\Controllers\RegistrasiController;
 use App\Http\Controllers\KamarController;
+use App\Http\Controllers\KontrolLihatStatusPengajuan;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\RegistrasiController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+// UC-01: Registrasi Pengguna
 Route::get('/registrasi', [RegistrasiController::class, 'pilihMenuRegistrasi'])->name('registrasi.form');
 Route::post('/registrasi', [RegistrasiController::class, 'klikDaftar'])->name('registrasi.simpan');
 Route::get('/registrasi/berhasil', [RegistrasiController::class, 'halamanBerhasil'])->name('registrasi.berhasil');
 Route::get('/registrasi/masuk', [RegistrasiController::class, 'arahkanKeHalamanLogin'])->name('registrasi.login');
 
-require __DIR__ . '/keluhan.php';
+// UC-06: Melihat Status Pengajuan Sewa
+Route::get('/status-pengajuan', [KontrolLihatStatusPengajuan::class, 'pilihMenuStatus'])->name('pengajuan.status');
+Route::get('/status-pengajuan/muat-ulang', [KontrolLihatStatusPengajuan::class, 'muatUlang'])->name('pengajuan.muatUlang');
+Route::get('/status-pengajuan/{idPengajuan}', [KontrolLihatStatusPengajuan::class, 'lihatDetailStatus'])->whereNumber('idPengajuan')->name('pengajuan.detail');
+
 // UC-02 login
 Route::get('/login', [LoginController::class, 'pilihMenuLogin'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.proses');
@@ -32,3 +38,6 @@ Route::delete('/kost/{idKost}/kamar/{idKamar}', [KamarController::class, 'konfir
 require __DIR__ . '/keluhan.php';
 require __DIR__ . '/keluhan-pemilik.php';
 require __DIR__ . '/keuangan.php';
+
+// UC-09: Mengelola dan Publikasi Data Kost
+require __DIR__ . '/kelola-kost.php';
