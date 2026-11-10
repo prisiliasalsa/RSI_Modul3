@@ -3,6 +3,7 @@
 use App\Http\Controllers\KamarController;
 use App\Http\Controllers\KontrolLihatStatusPengajuan;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\PengajuanController;
 use App\Http\Controllers\RegistrasiController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +34,18 @@ Route::get('/kost/{idKost}/kamar/{idKamar}/ubah', [KamarController::class, 'buka
 Route::put('/kost/{idKost}/kamar/{idKamar}', [KamarController::class, 'simpanKamar'])->name('kamar.update');
 Route::get('/kost/{idKost}/kamar/{idKamar}/hapus', [KamarController::class, 'hapusKamar'])->name('kamar.hapus');
 Route::delete('/kost/{idKost}/kamar/{idKamar}', [KamarController::class, 'konfirmasiHapus'])->name('kamar.destroy');
+
+// UC-11 
+Route::prefix('verifikasi-pengajuan')->name('verifikasi.')->group(function () {
+    Route::get('/', [PengajuanController::class, 'bukaDaftarPengajuan'])
+        ->name('daftar');
+    Route::get('/{idPengajuan}', [PengajuanController::class, 'bukaDetail'])
+        ->whereNumber('idPengajuan')->name('detail');
+    Route::post('/{idPengajuan}/setujui', [PengajuanController::class, 'setujuiPengajuan'])
+        ->whereNumber('idPengajuan')->name('setujui');
+    Route::post('/{idPengajuan}/tolak', [PengajuanController::class, 'tolakPengajuan'])
+        ->whereNumber('idPengajuan')->name('tolak');
+});
 
 // Fitur teman (keluhan, keuangan, dll.)
 require __DIR__ . '/keluhan.php';

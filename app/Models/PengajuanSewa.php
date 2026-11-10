@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 /**
  * <<entity>> PengajuanSewa (CD-06), memakai tabel `pengajuansewa` pada database/schema.sql.
@@ -63,5 +64,58 @@ class PengajuanSewa extends Model
         return self::kueriDasar()
             ->where('p.idPengajuan', $idPengajuan)
             ->first();
+    }
+
+    // UC-11: daftar pengajuan berstatus Menunggu untuk kost milik pemilik
+    public static function getPengajuanMenunggu(int $idPemilik): Collection
+    {
+        return DB::table('pengajuansewa as ps')
+            ->join('kost as k', 'k.idKost', '=', 'ps.idKost')
+            ->join('kamar as km', 'km.idKamar', '=', 'ps.idKamar')
+            ->where('k.idPemilik', $idPemilik)
+            ->where('ps.status', 'Menunggu')
+            ->orderByDesc('ps.tanggalPengajuan')
+            ->get([
+                'ps.idPengajuan',
+                'ps.idCalonPenghuni',
+                'ps.tanggalPengajuan',
+                'ps.durasiSewa',
+                'ps.jumlahPenghuni',
+                'k.namaKost',
+                'km.nomorKamar',
+            ]);
+    }
+
+    // UC-11: detail satu pengajuan, hanya jika kost-nya milik pemilik yang login
+    public static function getDetailPengajuan(int $idPengajuan, int $idPemilik): ?object
+    {
+        return DB::table('pengajuansewa as ps')
+            ->join('kost as k', 'k.idKost', '=', 'ps.idKost')
+            ->join('kamar as km', 'km.idKamar', '=', 'ps.idKamar')
+            ->where('ps.idPengajuan', $idPengajuan)
+            ->where('k.idPemilik', $idPemilik)
+            ->first([
+                'ps.*',
+                'k.namaKost',
+                'km.nomorKamar',
+                'km.hargaSewa',
+            ]);
+    }
+
+    // UC-11: ubah status pengajuan (Disetujui / Ditolak)
+    public static function updateStatus(int $idPengajuan, string $status, ?string $alasan = null): bool
+    {
+        try {
+            DB::table('pengajuansewa')
+                ->where('idPengajuan', $idPengajuan)
+                ->update([
+                    'status' => $status,
+                    'alasanPenolakan' => $alasan,
+                ]);
+            return true;
+        } catch (Throwable $e) {
+            report($e);
+            return false;
+        }
     }
 }
