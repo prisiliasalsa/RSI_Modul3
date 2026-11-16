@@ -19,16 +19,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 /**
- * <<control>> KontrolVerifikasiPembayaran (CD-13)
- * UC-13 Memverifikasi Pembayaran, pseudocode PC-13.
- * Boundary: resources/views/verifikasi-pembayaran (HalamanVerifikasiPembayaran)
+ * KontrolVerifikasiPembayaran (CD-13)
+ * UC-13 Memverifikasi Pembayaran
  */
 class KontrolVerifikasiPembayaran extends Controller
 {
-    // Batas panjang alasan sesuai kolom alasanPenolakan VARCHAR(1000)
     private int $maksAlasan = 1000;
 
-    // UC-13 langkah 1-3: daftar pembayaran "Menunggu Verifikasi"
+    // Menampilkan daftar pembayaran yang menunggu verifikasi
     public function lihatDaftarPembayaran(Request $request): View
     {
         $pemilik = $this->pemilikAktif($request);
@@ -40,14 +38,18 @@ class KontrolVerifikasiPembayaran extends Controller
         try {
             $query = Pembayaran::getMenungguVerifikasi($pemilik->idAkun);
 
-            // Ringkasan dihitung dari semua pembayaran yang menunggu
             $jumlahMenunggu = (clone $query)->count();
-            $totalNominal = (float) (clone $query)->sum('pb.jumlahPembayaran');
+            $totalNominal = (float) (clone $query)
+                ->sum('pb.jumlahPembayaran');
 
-            $daftar = Pembayaran::getMenungguVerifikasi($pemilik->idAkun, $cari)
+            $daftar = Pembayaran::getMenungguVerifikasi(
+                $pemilik->idAkun,
+                $cari
+            )
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn ($baris) => $this->formatPembayaran($baris));
+
         } catch (Throwable $error) {
             report($error);
             $gangguan = true;
@@ -65,32 +67,47 @@ class KontrolVerifikasiPembayaran extends Controller
         ]);
     }
 
-    // UC-13 langkah 4-6: detail tagihan dan bukti pembayaran.
-    // ?aksi=terima menampilkan konfirmasi, ?aksi=tolak form alasan.
+    // Menampilkan detail pembayaran dan bukti transfer
     public function lihatDetailPembayaran(
         Request $request,
         int $idPembayaran
     ): View|RedirectResponse {
+
         $pemilik = $this->pemilikAktif($request);
 
         try {
-            $pembayaran = Pembayaran::getDetail($idPembayaran, $pemilik->idAkun);
+            $pembayaran = Pembayaran::getDetail(
+                $idPembayaran,
+                $pemilik->idAkun
+            );
+
             $tagihan = $pembayaran
                 ? TagihanSewa::getTagihan($pembayaran->idTagihan)
                 : null;
+
         } catch (Throwable $error) {
             report($error);
-            return redirect()->route('pemilik.verifikasi.daftar')
+
+            return redirect()
+                ->route('pemilik.verifikasi.daftar')
                 ->with('pesanGagal', 'Terjadi gangguan data');
         }
 
-        abort_unless($pembayaran && $tagihan, 404, 'Pembayaran tidak ditemukan.');
+        abort_unless(
+            $pembayaran && $tagihan,
+            404,
+            'Pembayaran tidak ditemukan.'
+        );
 
         $aksi = $request->query('aksi');
+
         $bisaDiverifikasi = $pembayaran->statusPembayaran
             === Pembayaran::STATUS_MENUNGGU;
 
-        if (!$bisaDiverifikasi || !in_array($aksi, ['terima', 'tolak'], true)) {
+        if (
+            !$bisaDiverifikasi ||
+            !in_array($aksi, ['terima', 'tolak'], true)
+        ) {
             $aksi = null;
         }
 
@@ -102,206 +119,350 @@ class KontrolVerifikasiPembayaran extends Controller
             'aksi' => $aksi,
             'bisaDiverifikasi' => $bisaDiverifikasi,
             'buktiTersedia' => $pembayaran->buktiBayar
-                && Storage::disk('local')->exists($pembayaran->buktiBayar),
+                && Storage::disk('local')->exists(
+                    $pembayaran->buktiBayar
+                ),
         ]);
     }
 
-    // UC-13 langkah 10-12: dipanggil setelah "Ya, Terima"
+    // Menerima pembayaran dan mengaktifkan penghuni
     public function terimaPembayaran(
         Request $request,
         int $idPembayaran
     ): RedirectResponse {
+
         $pemilik = $this->pemilikAktif($request);
-        $pembayaran = Pembayaran::getDetail($idPembayaran, $pemilik->idAkun);
-        abort_unless($pembayaran, 404, 'Pembayaran tidak ditemukan.');
+
+        $pembayaran = Pembayaran::getDetail(
+            $idPembayaran,
+            $pemilik->idAkun
+        );
+
+        abort_unless(
+            $pembayaran,
+            404,
+            'Pembayaran tidak ditemukan.'
+        );
 
         $periode = $this->labelPeriode($pembayaran->periode);
 
         try {
             DB::transaction(function () use ($pembayaran, $periode) {
+
                 $id = (int) $pembayaran->idPembayaran;
 
+                // Mengambil tagihan terkait pembayaran
                 $tagihan = DB::table('tagihansewa')
                     ->where('idTagihan', $pembayaran->idTagihan)
                     ->lockForUpdate()
                     ->first(['idPenghuni', 'idKamar']);
 
-                if (!$tagihan || (int) $tagihan->idPenghuni !== (int) $pembayaran->idPenghuni) {
-                    throw new RuntimeException('Tagihan dan data penghuni pembayaran tidak cocok.');
+                if (
+                    !$tagihan ||
+                    (int) $tagihan->idPenghuni !==
+                    (int) $pembayaran->idPenghuni
+                ) {
+                    throw new RuntimeException(
+                        'Tagihan dan data penghuni pembayaran tidak cocok.'
+                    );
                 }
 
+                // Memeriksa kamar yang disewa
                 $kamar = DB::table('kamar')
                     ->where('idKamar', $tagihan->idKamar)
                     ->where('idKost', $pembayaran->idKost)
                     ->lockForUpdate()
-                    ->first(['idKamar', 'idKost', 'statusKamar']);
+                    ->first([
+                        'idKamar',
+                        'idKost',
+                        'statusKamar'
+                    ]);
 
                 if (!$kamar) {
-                    throw new RuntimeException('Kamar pada tagihan tidak ditemukan.');
+                    throw new RuntimeException(
+                        'Kamar pada tagihan tidak ditemukan.'
+                    );
                 }
 
+                // Mengambil data penghuni
                 $penghuni = DB::table('penghuni')
                     ->where('idPenghuni', $tagihan->idPenghuni)
                     ->where('idKamar', $kamar->idKamar)
                     ->where('idKost', $kamar->idKost)
                     ->lockForUpdate()
-                    ->first(['idPenghuni', 'status']);
+                    ->first([
+                        'idPenghuni',
+                        'status'
+                    ]);
 
                 if (!$penghuni) {
-                    throw new RuntimeException('Data penghuni tidak cocok dengan kamar pada tagihan.');
+                    throw new RuntimeException(
+                        'Data penghuni tidak cocok dengan kamar pada tagihan.'
+                    );
                 }
 
+                // Mengaktifkan penghuni yang menunggu pembayaran
                 if ($penghuni->status === 'Menunggu Pembayaran') {
+
                     $penghuniAktifLain = DB::table('penghuni')
                         ->where('idKamar', $kamar->idKamar)
-                        ->where('idPenghuni', '!=', $penghuni->idPenghuni)
+                        ->where(
+                            'idPenghuni',
+                            '!=',
+                            $penghuni->idPenghuni
+                        )
                         ->where('status', 'Aktif')
                         ->exists();
 
-                    if ($kamar->statusKamar !== 'Tersedia' || $penghuniAktifLain) {
-                        throw new RuntimeException('Kamar sudah tidak tersedia untuk aktivasi hunian.');
+                    if (
+                        $kamar->statusKamar !== 'Tersedia' ||
+                        $penghuniAktifLain
+                    ) {
+                        throw new RuntimeException(
+                            'Kamar sudah tidak tersedia untuk aktivasi hunian.'
+                        );
                     }
 
+                    // Mengubah status penghuni menjadi aktif
                     DB::table('penghuni')
                         ->where('idPenghuni', $penghuni->idPenghuni)
-                        ->update(['status' => 'Aktif']);
+                        ->update([
+                            'status' => 'Aktif'
+                        ]);
 
+                    // Mengubah status kamar menjadi terisi
                     DB::table('kamar')
                         ->where('idKamar', $kamar->idKamar)
-                        ->update(['statusKamar' => 'Terisi']);
+                        ->update([
+                            'statusKamar' => 'Terisi'
+                        ]);
                 }
 
-                if (!Pembayaran::ubahStatus($id, Pembayaran::STATUS_LUNAS, null)) {
-                    throw new RuntimeException('Pembayaran sudah diverifikasi.');
+                // Memverifikasi status pembayaran
+                if (
+                    !Pembayaran::ubahStatus(
+                        $id,
+                        Pembayaran::STATUS_LUNAS,
+                        null
+                    )
+                ) {
+                    throw new RuntimeException(
+                        'Pembayaran sudah diverifikasi.'
+                    );
                 }
 
+                // Memperbarui status tagihan
                 TagihanSewa::ubahStatus(
                     (int) $pembayaran->idTagihan,
                     TagihanSewa::STATUS_LUNAS
                 );
 
+                // Mencatat transaksi keuangan
                 DataKeuangan::catatTransaksi($id);
 
+                // Mengirim notifikasi kepada penghuni
                 Notifikasi::kirimNotif(
                     $id,
                     "Pembayaran tagihan {$periode} telah diverifikasi dan Lunas."
                 );
             });
+
         } catch (Throwable $error) {
             report($error);
+
             return back()->with(
                 'pesanGagal',
                 'Pembayaran gagal diverifikasi, silakan coba kembali'
             );
         }
 
-        return redirect()->route('pemilik.verifikasi.daftar')
-            ->with('pesanBerhasil', 'Pembayaran berhasil diverifikasi');
+        return redirect()
+            ->route('pemilik.verifikasi.daftar')
+            ->with(
+                'pesanBerhasil',
+                'Pembayaran berhasil diverifikasi'
+            );
     }
 
-    // Alternative Flow 2 langkah 11a: alasan wajib diisi
+    // Memastikan alasan penolakan tidak kosong
     public function validasiAlasan(?string $alasan): bool
     {
         return trim((string) $alasan) !== '';
     }
 
-    // Alternative Flow 2 langkah 10a-13a: menolak pembayaran
+    // Menolak pembayaran dengan alasan
     public function tolakPembayaran(
         Request $request,
         int $idPembayaran
     ): RedirectResponse {
-        $pemilik = $this->pemilikAktif($request);
-        $pembayaran = Pembayaran::getDetail($idPembayaran, $pemilik->idAkun);
-        abort_unless($pembayaran, 404, 'Pembayaran tidak ditemukan.');
 
-        $alasan = trim((string) $request->input('alasanPenolakan'));
+        $pemilik = $this->pemilikAktif($request);
+
+        $pembayaran = Pembayaran::getDetail(
+            $idPembayaran,
+            $pemilik->idAkun
+        );
+
+        abort_unless(
+            $pembayaran,
+            404,
+            'Pembayaran tidak ditemukan.'
+        );
+
+        $alasan = trim(
+            (string) $request->input('alasanPenolakan')
+        );
 
         if (!$this->validasiAlasan($alasan)) {
             return back()->withErrors([
-                'alasanPenolakan' => 'Alasan harus diisi',
+                'alasanPenolakan' => 'Alasan harus diisi'
             ]);
         }
 
         if (mb_strlen($alasan) > $this->maksAlasan) {
-            return back()->withInput()->withErrors([
-                'alasanPenolakan' => 'Alasan maksimal 1000 karakter',
-            ]);
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'alasanPenolakan' => 'Alasan maksimal 1000 karakter'
+                ]);
         }
 
         $periode = $this->labelPeriode($pembayaran->periode);
 
         try {
-            DB::transaction(function () use ($pembayaran, $alasan, $periode) {
+            DB::transaction(function () use (
+                $pembayaran,
+                $alasan,
+                $periode
+            ) {
+
                 $id = (int) $pembayaran->idPembayaran;
 
-                if (!Pembayaran::ubahStatus($id, Pembayaran::STATUS_DITOLAK, $alasan)) {
-                    throw new RuntimeException('Pembayaran sudah diverifikasi.');
+                // Mengubah status pembayaran menjadi ditolak
+                if (
+                    !Pembayaran::ubahStatus(
+                        $id,
+                        Pembayaran::STATUS_DITOLAK,
+                        $alasan
+                    )
+                ) {
+                    throw new RuntimeException(
+                        'Pembayaran sudah diverifikasi.'
+                    );
                 }
 
+                // Mengembalikan tagihan menjadi belum lunas
                 TagihanSewa::ubahStatus(
                     (int) $pembayaran->idTagihan,
                     TagihanSewa::STATUS_BELUM_LUNAS
                 );
 
+                // Memberikan notifikasi penolakan
                 Notifikasi::kirimNotif(
                     $id,
                     "Pembayaran tagihan {$periode} ditolak. Alasan: {$alasan}"
                 );
             });
+
         } catch (Throwable $error) {
             report($error);
-            return back()->withInput()->with(
-                'pesanGagal',
-                'Pembayaran gagal ditolak, silakan coba kembali'
-            );
+
+            return back()
+                ->withInput()
+                ->with(
+                    'pesanGagal',
+                    'Pembayaran gagal ditolak, silakan coba kembali'
+                );
         }
 
-        return redirect()->route('pemilik.verifikasi.daftar')->with(
-            'pesanBerhasil',
-            'Pembayaran ditolak dan notifikasi dikirim ke Penghuni'
-        );
+        return redirect()
+            ->route('pemilik.verifikasi.daftar')
+            ->with(
+                'pesanBerhasil',
+                'Pembayaran ditolak dan notifikasi dikirim ke Penghuni'
+            );
     }
 
-    // Menampilkan berkas bukti yang disimpan UC-07 di disk "local"
-    public function lihatBukti(Request $request, int $idPembayaran): Response
-    {
+    // Menampilkan bukti pembayaran
+    public function lihatBukti(
+        Request $request,
+        int $idPembayaran
+    ): Response {
+
         $pemilik = $this->pemilikAktif($request);
-        $pembayaran = Pembayaran::getDetail($idPembayaran, $pemilik->idAkun);
+
+        $pembayaran = Pembayaran::getDetail(
+            $idPembayaran,
+            $pemilik->idAkun
+        );
 
         abort_unless(
             $pembayaran
                 && $pembayaran->buktiBayar
-                && Storage::disk('local')->exists($pembayaran->buktiBayar),
+                && Storage::disk('local')->exists(
+                    $pembayaran->buktiBayar
+                ),
             404,
             'Bukti pembayaran tidak ditemukan.'
         );
 
-        return Storage::disk('local')->response($pembayaran->buktiBayar);
+        return Storage::disk('local')
+            ->response($pembayaran->buktiBayar);
     }
 
+    // Menyiapkan format tampilan pembayaran
     private function formatPembayaran(object $baris): object
     {
-        $baris->periodeLabel = $this->labelPeriode($baris->periode);
+        $baris->periodeLabel = $this->labelPeriode(
+            $baris->periode
+        );
+
         $baris->periodeSingkat = $baris->periode
             ? Carbon::createFromFormat('!Y-m', $baris->periode)
-                ->locale('id')->translatedFormat('M Y')
+                ->locale('id')
+                ->translatedFormat('M Y')
             : '-';
-        $baris->nominalRupiah = $this->rupiah($baris->jumlahPembayaran);
-        $baris->tagihanRupiah = $this->rupiah($baris->jumlahTagihan);
-        $baris->hargaSewaRupiah = $this->rupiah($baris->hargaSewa);
-        $baris->nominalSesuai = (float) $baris->jumlahPembayaran
+
+        $baris->nominalRupiah = $this->rupiah(
+            $baris->jumlahPembayaran
+        );
+
+        $baris->tagihanRupiah = $this->rupiah(
+            $baris->jumlahTagihan
+        );
+
+        $baris->hargaSewaRupiah = $this->rupiah(
+            $baris->hargaSewa
+        );
+
+        $baris->nominalSesuai =
+            (float) $baris->jumlahPembayaran
             === (float) $baris->jumlahTagihan;
+
         $baris->tanggalLabel = $baris->tanggalPembayaran
             ? Carbon::parse($baris->tanggalPembayaran)
-                ->locale('id')->translatedFormat('d F Y')
+                ->locale('id')
+                ->translatedFormat('d F Y')
             : '-';
-        $baris->metodeLabel = $baris->metode === 'Transfer Bank' && $baris->namaBank
-            ? 'transfer ' . $baris->namaBank
-            : ($baris->metode ?: '-');
 
-        $ekstensi = strtolower(pathinfo((string) $baris->buktiBayar, PATHINFO_EXTENSION));
+        $baris->metodeLabel =
+            $baris->metode === 'Transfer Bank'
+            && $baris->namaBank
+                ? 'transfer ' . $baris->namaBank
+                : ($baris->metode ?: '-');
+
+        $ekstensi = strtolower(
+            pathinfo(
+                (string) $baris->buktiBayar,
+                PATHINFO_EXTENSION
+            )
+        );
+
         $baris->buktiAdalahPdf = $ekstensi === 'pdf';
-        $baris->statusKelas = match ($baris->statusPembayaran) {
+
+        $baris->statusKelas = match (
+            $baris->statusPembayaran
+        ) {
             Pembayaran::STATUS_LUNAS => 'status-lunas',
             Pembayaran::STATUS_DITOLAK => 'status-ditolak',
             default => 'status-menunggu',
@@ -310,6 +471,7 @@ class KontrolVerifikasiPembayaran extends Controller
         return $baris;
     }
 
+    // Format periode pembayaran
     private function labelPeriode(?string $periode): string
     {
         if (!$periode) {
@@ -321,11 +483,19 @@ class KontrolVerifikasiPembayaran extends Controller
             ->translatedFormat('F Y');
     }
 
-    private function rupiah(float|int|string|null $nilai): string
-    {
-        return 'Rp' . number_format((float) $nilai, 0, ',', '.');
+    // Format nominal menjadi rupiah
+    private function rupiah(
+        float|int|string|null $nilai
+    ): string {
+        return 'Rp' . number_format(
+            (float) $nilai,
+            0,
+            ',',
+            '.'
+        );
     }
 
+    // Mengambil nama kost milik pemilik
     private function namaKostHeader(int $idPemilik): string
     {
         return DB::table('kost')
@@ -334,18 +504,28 @@ class KontrolVerifikasiPembayaran extends Controller
             ->value('namaKost') ?: 'Kost.io';
     }
 
-    // Pemilik Kost yang login dari sesi UC-02
+    // Memastikan akun yang login adalah pemilik kost
     private function pemilikAktif(Request $request): object
     {
-        $idAkun = $request->session()->get('idAkun') ?? Auth::id();
-        abort_unless($idAkun, 403, 'Silakan login sebagai pemilik kost.');
+        $idAkun = $request->session()->get('idAkun')
+            ?? Auth::id();
+
+        abort_unless(
+            $idAkun,
+            403,
+            'Silakan login sebagai pemilik kost.'
+        );
 
         $pemilik = DB::table('akun')
             ->where('idAkun', $idAkun)
             ->where('jenisAkun', 'Pemilik Kost')
             ->first();
 
-        abort_unless($pemilik, 403, 'Akses khusus pemilik kost.');
+        abort_unless(
+            $pemilik,
+            403,
+            'Akses khusus pemilik kost.'
+        );
 
         return $pemilik;
     }
