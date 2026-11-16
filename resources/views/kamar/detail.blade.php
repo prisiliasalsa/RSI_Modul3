@@ -642,7 +642,7 @@ $inisialAkun = substr($inisialAkun, 0, 2);
     <?php if ($tersedia): ?>
 
     <a
-        href="../controllers/KontrolPengajuanSewa.php?aksi=form&idKamar=<?= urlencode($kamar['idKamar']) ?>"
+        href="{{ route('pengajuan.ajukan', ['idKamar' => $kamar['idKamar']]) }}"
         class="button button-primary"
     >
         Ajukan Sewa

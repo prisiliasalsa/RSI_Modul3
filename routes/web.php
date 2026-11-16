@@ -8,6 +8,8 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegistrasiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\KontrolPengajuanSewa;
+use App\Http\Controllers\VerifikasiPengajuanSewaController;
+use App\Http\Controllers\TagihanSewaController;
 
 Route::get('/', fn () => view('welcome'));
 
@@ -29,6 +31,13 @@ Route::get('/cari-kost/{idKost}', [DetailKostController::class, 'detailKost'])
     ->whereNumber('idKost')->name('kost.detail');
 Route::get('/cari-kost/kamar/{idKamar}', [DetailKostController::class, 'detailKamar'])
     ->whereNumber('idKamar')->name('kamar.detail');
+Route::get('/cari-kost/kamar/{idKamar}/ajukan-sewa', [KontrolPengajuanSewa::class, 'tampilFormAjukanSewa'])
+    ->whereNumber('idKamar')
+    ->name('pengajuan.ajukan');
+
+Route::post('/cari-kost/kamar/{idKamar}/ajukan-sewa', [KontrolPengajuanSewa::class, 'simpanPengajuan'])
+    ->whereNumber('idKamar')
+    ->name('pengajuan.simpan');
 
 // UC-06: Status pengajuan sewa
 Route::get('/status-pengajuan', [KontrolLihatStatusPengajuan::class, 'pilihMenuStatus'])
@@ -37,6 +46,16 @@ Route::get('/status-pengajuan/muat-ulang', [KontrolLihatStatusPengajuan::class, 
     ->name('pengajuan.muatUlang');
 Route::get('/status-pengajuan/{idPengajuan}', [KontrolLihatStatusPengajuan::class, 'lihatDetailStatus'])
     ->whereNumber('idPengajuan')->name('pengajuan.detail');
+
+//uc07
+Route::get('/tagihan-sewa', [TagihanSewaController::class, 'index'])
+    ->name('tagihan-sewa.index');
+Route::get('/tagihan-sewa/{idTagihan}/bayar', [TagihanSewaController::class, 'index'])
+    ->whereNumber('idTagihan')
+    ->name('tagihan-sewa.form-bayar');
+Route::post('/tagihan-sewa/{idTagihan}/bayar', [TagihanSewaController::class, 'bayar'])
+    ->whereNumber('idTagihan')
+    ->name('tagihan-sewa.bayar');
 
 // UC-10: Kelola kamar
 Route::get('/kost/{idKost}/kamar', [KamarController::class, 'bukaDaftarKamar'])->name('kamar.index');
@@ -47,18 +66,19 @@ Route::put('/kost/{idKost}/kamar/{idKamar}', [KamarController::class, 'simpanKam
 Route::get('/kost/{idKost}/kamar/{idKamar}/hapus', [KamarController::class, 'hapusKamar'])->name('kamar.hapus');
 Route::delete('/kost/{idKost}/kamar/{idKamar}', [KamarController::class, 'konfirmasiHapus'])->name('kamar.destroy');
 
+
+//uc-1
+Route::get('/pemilik/pengajuan-sewa', [VerifikasiPengajuanSewaController::class, 'index'])
+    ->name('pemilik.pengajuan-sewa.index');
+
+Route::post('/pemilik/pengajuan-sewa/{idPengajuan}/keputusan', [VerifikasiPengajuanSewaController::class, 'putuskan'])
+    ->whereNumber('idPengajuan')
+    ->name('pemilik.pengajuan-sewa.putuskan');
+
 // Rute modul lain
 require __DIR__ . '/keluhan.php';
 require __DIR__ . '/keluhan-pemilik.php';
 require __DIR__ . '/kelola-kost.php';
 require __DIR__ . '/keuangan.php';
 //require __DIR__ . '/data-penghuni.php';
-//require __DIR__ . '/verifikasi-pembayaran.php';
-
-Route::get('/cari-kost/kamar/{idKamar}/ajukan-sewa', [KontrolPengajuanSewa::class, 'tampilFormAjukanSewa'])
-    ->whereNumber('idKamar')
-    ->name('pengajuan.ajukan');
-
-Route::post('/cari-kost/kamar/{idKamar}/ajukan-sewa', [KontrolPengajuanSewa::class, 'simpanPengajuan'])
-    ->whereNumber('idKamar')
-    ->name('pengajuan.simpan');
+require __DIR__ . '/verifikasi-pembayaran.php';

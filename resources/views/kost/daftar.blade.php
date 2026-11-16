@@ -21,6 +21,9 @@
 
     <div class="aksi">
         <a class="btn btn-utama" href="{{ route('kost.tambah', $qs) }}">+ Tambah Kost</a>
+        <a class="btn btn-garis" href="{{ route('pemilik.pengajuan-sewa.index') }}">
+            Pengajuan Sewa
+        </a>
     </div>
 
     @if ($mode === 'daftar')

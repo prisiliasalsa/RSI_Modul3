@@ -147,11 +147,11 @@
 
         <a class="menu aktif" href="{{ route('kost.daftar', $qs) }}">Kelola Kost</a>
         <a class="menu" href="{{ url('/kelola-kamar') }}">Kelola Kamar</a>
-        <a class="menu" href="{{ url('/pengajuan-sewa') }}">Pengajuan Sewa</a>
+        <a class="menu" href="{{ route('pemilik.pengajuan-sewa.index') }}">Pengajuan Sewa</a>
         <a class="menu" href="{{ url('/data-penghuni') }}">Data Penghuni</a>
-        <a class="menu" href="{{ url('/verifikasi-pembayaran') }}">Verifikasi Pembayaran</a>
+        <a class="menu" href="{{ route('pemilik.verifikasi.daftar') }}">Verifikasi Pembayaran</a>
         <a class="menu" href="{{ url('/keluhan-pemilik') }}">Keluhan / Kerusakan</a>
-        <a class="menu" href="{{ url('/laporan-keuangan') }}">Laporan Keuangan</a>
+        <a class="menu" href="{{ route('pemilik.keuangan.index') }}">Laporan Keuangan</a>
 
         <div class="spasi"></div>
         <div class="kotak"><strong>Butuh bantuan?</strong><span>Kelola tempat tinggal dengan lebih tenang.</span></div>

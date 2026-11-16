@@ -1,5 +1,3 @@
-
-
 USE `kost_io`;
 
 -- 1. AKUN
