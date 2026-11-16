@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@yield('judul') | Kost.io</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --navy: #022E4A;
+            --navy2: #173E54;
+            --maroon: #56061D;
+            --steel: #4F7794;
+            --sand: #E2D8CB;
+            --krem: #F5F0EA;
+            --muted: #5B6871;
+            --line: #E3DFD5;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            color: var(--navy);
+            background: var(--krem);
+        }
+
+        a { color: inherit; }
+
+        .app {
+            display: grid;
+            grid-template-columns: 244px minmax(0, 1fr);
+            min-height: 100vh;
+        }
+
+        .sb {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            padding: 32px 20px 24px;
+            background: var(--navy);
+            color: #fff;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 27px;
+            font-weight: 600;
+            line-height: 1.45;
+        }
+
+        .kotak {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 12px;
+            background: var(--navy2);
+            border-radius: 10px;
+            line-height: 1.45;
+        }
+
+        .kotak small, .kotak span {
+            color: var(--sand);
+            font-size: 13px;
+        }
+
+        .kotak strong {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .kotak.bantuan {
+            gap: 8px;
+            padding: 16px;
+            border-radius: 16px;
+        }
+
+        .navigasi {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .menu {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 10px;
+            color: var(--sand);
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.45;
+            text-decoration: none;
+        }
+
+        .menu svg { flex: none; }
+        .menu:hover { background: var(--navy2); }
+        .menu.aktif { background: var(--maroon); color: #fff; }
+        .spasi { flex: 1; }
+        .area { min-width: 0; }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+            height: 80px;
+            padding: 0 24px;
+            background: #fff;
+            color: var(--muted);
+            font-size: 13px;
+            box-shadow: 0 1px 4px rgba(12, 12, 13, .05);
+        }
+
+        .user {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .avatar {
+            display: grid;
+            place-items: center;
+            flex: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--sand);
+            color: var(--maroon);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .user .nama {
+            color: var(--navy);
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.45;
+        }
+
+        .user .peran {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .isi { padding: 40px 40px 48px; }
+        .jejak { margin-bottom: 24px; color: var(--muted); font-size: 13px; }
+        .jejak a { text-decoration: none; }
+        .jejak a:hover { text-decoration: underline; }
+
+        .baris-judul {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h1 { margin: 0; font-size: 28px; font-weight: 600; }
+
+        .lencana {
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: var(--steel);
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .sub { margin: 24px 0; color: var(--muted); font-size: 15px; }
+
+        .kartu {
+            overflow: auto;
+            margin-bottom: 18px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        .kartu-atas {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 22px;
+        }
+
+        .kartu-atas strong { font-size: 14px; }
+
+        .cari {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 240px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: var(--krem);
+        }
+
+        .cari input {
+            width: 100%;
+            border: 0;
+            background: transparent;
+            color: var(--navy);
+            font: inherit;
+            font-size: 13px;
+        }
+
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+        th {
+            padding: 12px 22px;
+            background: var(--krem);
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 500;
+            text-align: left;
+        }
+
+        td { padding: 16px 22px; border-top: 1px solid var(--line); }
+        tbody tr[data-url] { cursor: pointer; }
+        tbody tr.dipilih { background: #FAF7F0; }
+        td.kostkamar { font-weight: 600; }
+        td a { color: var(--maroon); font-weight: 600; text-decoration: none; }
+        td a:hover { text-decoration: underline; }
+
+        .lencana-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: var(--sand);
+            color: var(--navy);
+            font-size: 12px;
+        }
+
+        .lencana-status.ditolak { background: #F6E3E8; color: var(--maroon); }
+        .lencana-status.disetujui { background: #E1EBF3; color: #2D5A7B; }
+
+        .kaki {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 22px;
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .pager { display: flex; gap: 14px; }
+        .aksi { display: flex; flex-wrap: wrap; gap: 12px; }
+
+        .btn {
+            display: inline-block;
+            padding: 13px 20px;
+            border: 1px solid var(--maroon);
+            border-radius: 10px;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-utama { background: var(--maroon); color: #fff; }
+        .btn-utama:hover { background: #480819; }
+        .btn-garis { border-color: var(--line); background: #fff; color: var(--navy); }
+        .btn-garis:hover { background: var(--krem); }
+
+        .kosong { padding: 40px 24px; text-align: center; }
+
+        .ikon {
+            display: grid;
+            place-items: center;
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 16px;
+            border-radius: 14px;
+            background: var(--sand);
+        }
+
+        .kosong h2 { margin: 0 0 8px; font-size: 20px; font-weight: 600; }
+        .kosong p { margin: 0; color: var(--muted); font-size: 13px; }
+
+        .ringkas {
+            display: grid;
+            gap: 6px;
+            margin-bottom: 14px;
+            padding: 18px 20px;
+            border-radius: 10px;
+            background: var(--sand);
+        }
+
+        .ringkas span { color: var(--muted); font-size: 14px; }
+
+        .status-banner {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            padding: 14px 18px;
+            border-radius: 8px;
+            background: #E8EEF4;
+            color: #3D6481;
+            font-size: 14px;
+        }
+
+        .status-banner.ditolak { background: #F6E3E8; color: var(--maroon); }
+        .status-banner.menunggu { background: var(--sand); color: var(--navy); }
+        .status-banner.netral { background: #ECEFF2; color: var(--muted); }
+
+        @media (max-width: 900px) {
+            .app { grid-template-columns: minmax(0, 1fr); }
+
+            .sb {
+                position: static;
+                height: auto;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 12px;
+                padding: 14px 18px;
+            }
+
+            .sb .kotak, .sb .spasi { display: none; }
+            .navigasi { flex-direction: row; flex-wrap: wrap; }
+            .top { height: auto; min-height: 68px; padding: 12px 18px; }
+            .user { gap: 10px; }
+            .isi { padding: 28px 18px 40px; }
+            .cari { width: 100%; }
+            .kartu-atas { flex-wrap: wrap; }
+            table { font-size: 13px; }
+            th, td { padding-left: 14px; padding-right: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="sb">
+            <div class="brand">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                     stroke="#E2D8CB" stroke-width="1.8" stroke-linecap="round"
+                     stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>
+                </svg>
+                <span>kost.io</span>
+            </div>
+
+            <div class="kotak">
+                <small>RUANG PENGHUNI</small>
+                <strong>Temukan nyamannya</strong>
+            </div>
+
+            <nav class="navigasi" aria-label="Menu calon penghuni">
+                <a class="menu" href="{{ route('kost.cari') }}">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                         aria-hidden="true">
+                        <circle cx="11" cy="11" r="7"/>
+                        <path d="M21 21l-4.3-4.3"/>
+                    </svg>
+                    <span>Cari Kost</span>
+                </a>
+
+                <a class="menu aktif" href="{{ route('pengajuan.status', $qs ?? []) }}">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                         stroke-linejoin="round" aria-hidden="true">
+                        <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
+                        <path d="M14 3v5h5"/>
+                    </svg>
+                    <span>Status Pengajuan</span>
+                </a>
+            </nav>
+
+            <div class="spasi"></div>
+
+            <div class="kotak bantuan">
+                <strong>Butuh bantuan?</strong>
+                <span>Kelola tempat tinggal dengan lebih tenang.</span>
+            </div>
+
+            <a class="menu" href="{{ url('/logout') }}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                     stroke-linejoin="round" aria-hidden="true">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <path d="M16 17l5-5-5-5M21 12H9"/>
+                </svg>
+                <span>Keluar</span>
+            </a>
+        </aside>
+
+        <div class="area">
+            <header class="top">
+                <div>Kost.io &nbsp;/&nbsp; {{ $pengguna['peran'] }}</div>
+
+                <div class="user">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                         stroke="#5B6871" stroke-width="1.8" stroke-linecap="round"
+                         stroke-linejoin="round" aria-hidden="true">
+                        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+                        <path d="M13.7 21a2 2 0 0 1-3.4 0"/>
+                    </svg>
+
+                    <div class="avatar">{{ $pengguna['inisial'] }}</div>
+                    <div>
+                        <div class="nama">{{ $pengguna['nama'] }}</div>
+                        <div class="peran">{{ $pengguna['peran'] }}</div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="isi">
+                <div class="jejak">BERANDA / @yield('jejak')</div>
+
+                <div class="baris-judul">
+                    <h1>@yield('heading')</h1>
+                    <span class="lencana">Kost.io</span>
+                </div>
+
+                <p class="sub">Pantau perkembangan dan keputusan pengajuan sewamu.</p>
+
+                @yield('konten')
+            </main>
+        </div>
+    </div>
+</body>
+</html>

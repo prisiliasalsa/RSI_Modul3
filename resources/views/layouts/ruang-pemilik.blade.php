@@ -27,7 +27,7 @@
         $menu = [
             ['kunci' => 'kost', 'ikon' => 'home', 'label' => 'Kelola Kost', 'route' => 'kost.daftar'],
             ['kunci' => 'kamar', 'ikon' => 'key', 'label' => 'Kelola Kamar', 'route' => null],
-            ['kunci' => 'pengajuan', 'ikon' => 'file', 'label' => 'Pengajuan Sewa', 'route' => null],
+            ['kunci' => 'pengajuan', 'ikon' => 'file', 'label' => 'Pengajuan Sewa', 'route' => 'pemilik.pengajuan-sewa.index'],   
             ['kunci' => 'penghuni', 'ikon' => 'users', 'label' => 'Data Penghuni', 'route' => 'pemilik.penghuni.daftar'],
             ['kunci' => 'verifikasi', 'ikon' => 'wallet', 'label' => 'Verifikasi Pembayaran', 'route' => 'pemilik.verifikasi.daftar'],
             ['kunci' => 'keluhan', 'ikon' => 'chat', 'label' => 'Keluhan / Kerusakan', 'route' => 'pemilik.keluhan.daftar'],
