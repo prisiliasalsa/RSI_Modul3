@@ -730,6 +730,7 @@ body {
 
                                 </div>
 
+                                <div class="small muted">Mulai dari</div>
                                 <div class="harga">
 
                                     <span class="title maroon">
