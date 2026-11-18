@@ -1,0 +1,400 @@
+/*
+  Kost.io • Unified visual system based on the Modul 2 Figma screens.
+  Shells for calon penghuni / penghuni / pemilik use identical structure.
+  Only applied to pages with a detected navigational sidebar (kio-ready).
+  Page business logic, data tables and form handlers remain unchanged.
+*/
+:root {
+  --kio-ink: #022e4a;
+  --kio-nav: #022e4a;
+  --kio-nav-soft: #173e54;
+  --kio-accent: #56061d;
+  --kio-accent-hover: #6d0b2b;
+  --kio-canvas: #f5f0ea;
+  --kio-paper: #ffffff;
+  --kio-beige: #e2d8cb;
+  --kio-muted: #5b6871;
+  --kio-line: #ded9d2;
+  --kio-blue: #507593;
+  --kio-radius: 12px;
+  --kio-sidebar-width: 244px;
+  /* Compatibility with pages built for different UCs */
+  --navy: var(--kio-ink);
+  --navy2: var(--kio-nav-soft);
+  --maroon: var(--kio-accent);
+  --steel: var(--kio-blue);
+  --krem: var(--kio-canvas);
+  --sand: var(--kio-beige);
+  --cream: var(--kio-canvas);
+  --canvas: var(--kio-canvas);
+  --accent: var(--kio-accent);
+  --nav: var(--kio-nav);
+  --navsoft: var(--kio-nav-soft);
+}
+
+body.kio-ready {
+  margin: 0;
+  color: var(--kio-ink);
+  background: var(--kio-canvas);
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+}
+body.kio-ready *,
+body.kio-ready *::before,
+body.kio-ready *::after { box-sizing: border-box; }
+
+body.kio-ready :is(.app, .layout, .dashboard, .rp-shell, .owner14-shell, .finance-shell) {
+  display: grid;
+  grid-template-columns: var(--kio-sidebar-width) minmax(0, 1fr);
+  min-height: 100vh;
+  background: var(--kio-canvas);
+}
+body.kio-ready:has(> aside.kio-sidebar) {
+  display: grid;
+  grid-template-columns: var(--kio-sidebar-width) minmax(0, 1fr);
+}
+body.kio-ready :is(.area, .main, .main-panel, .rp-main-wrap, .owner14-workarea, .finance-workspace-main, .workspace-area) { min-width: 0; }
+
+/* ONE SIDEBAR for all roles and UCs */
+body.kio-ready aside.kio-sidebar {
+  width: var(--kio-sidebar-width) !important;
+  min-width: 0;
+  height: 100vh;
+  min-height: 100vh;
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+  background: var(--kio-nav) !important;
+  color: #fff !important;
+  padding: 32px 20px 24px !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border: none;
+}
+body.kio-ready aside.kio-sidebar > .kio-sidebar-content {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  min-height: 100%;
+  gap: 0;
+}
+body.kio-ready .kio-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 0 0 8px;
+  min-height: 32px;
+  color: #fff !important;
+  font-size: 27px;
+  font-weight: 600;
+  text-decoration: none !important;
+  letter-spacing: -.5px;
+}
+body.kio-ready .kio-brand svg { width: 20px; height: 20px; flex-shrink: 0; }
+body.kio-ready .kio-brand strong { color: #fff !important; font-size: 27px; font-weight: 600; line-height: 1.45; }
+body.kio-ready .kio-workspace {
+  padding: 12px;
+  margin-top: 24px;
+  background: var(--kio-nav-soft);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #fff;
+}
+body.kio-ready .kio-workspace small { color: var(--kio-beige); font-size: 12px; line-height: 1.45; }
+body.kio-ready .kio-workspace span { color: #fff; font-size: 14px; font-weight: 500; }
+body.kio-ready .kio-nav {
+  display: flex !important;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  margin: 16px 0 0;
+  width: 100%;
+}
+body.kio-ready .kio-nav-link {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 12px;
+  border: 0;
+  border-radius: 10px;
+  color: var(--kio-beige) !important;
+  font: 500 14px/1.4 'Inter', sans-serif;
+  text-decoration: none !important;
+  background: transparent;
+  white-space: normal;
+  text-align: left;
+}
+body.kio-ready .kio-nav-link svg { width: 20px; height: 20px; flex: 0 0 20px; }
+body.kio-ready a.kio-nav-link:hover { background: var(--kio-nav-soft); color: #fff !important; }
+body.kio-ready .kio-nav-link.is-active,
+body.kio-ready .kio-nav-link.is-active:hover { background: var(--kio-accent); color: #fff !important; }
+body.kio-ready .kio-nav-link.is-disabled { opacity: .55; cursor: not-allowed; }
+body.kio-ready .kio-sidebar-grow { flex: 1; min-height: 24px; }
+body.kio-ready .kio-help {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--kio-nav-soft);
+  border-radius: 16px;
+  padding: 16px;
+  color: #fff;
+  font-size: 13px;
+}
+body.kio-ready .kio-help strong { color: #fff; font-size: 14px; font-weight: 500; }
+body.kio-ready .kio-help span { color: var(--kio-beige); font-size: 13px; }
+body.kio-ready .kio-logout { margin: 20px 0 0; }
+body.kio-ready .kio-logout button,
+body.kio-ready .kio-logout-link {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  color: var(--kio-beige) !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 10px;
+  font: 500 14px 'Inter', sans-serif;
+  text-align: left;
+  text-decoration: none !important;
+  cursor: pointer;
+}
+body.kio-ready .kio-logout button:hover,
+body.kio-ready .kio-logout-link:hover { background: var(--kio-nav-soft) !important; color: #fff !important; }
+body.kio-ready .kio-logout svg { width: 20px; height: 20px; }
+
+/* ONE TOPBAR for all roles and UCs */
+body.kio-ready .kio-header {
+  background: #fff !important;
+  min-height: 80px !important;
+  height: 80px !important;
+  width: 100%;
+  padding: 0 24px !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: var(--kio-muted);
+}
+body.kio-ready .kio-header-content { display: contents; }
+body.kio-ready .kio-head-path { color: var(--kio-muted); font-size: 13px; }
+body.kio-ready .kio-head-path span { margin: 0 14px; }
+body.kio-ready .kio-account { display: flex; gap: 16px; align-items: center; min-width: 0; }
+body.kio-ready .kio-bell { display: inline-flex; color: var(--kio-muted); }
+body.kio-ready .kio-avatar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 50%;
+  background: var(--kio-beige);
+  color: var(--kio-accent);
+  font-size: 14px;
+  font-weight: 500;
+}
+body.kio-ready .kio-account-text { display: flex; flex-direction: column; min-width: 120px; }
+body.kio-ready .kio-account-text strong { color: var(--kio-ink); font-size: 14px; font-weight: 500; }
+body.kio-ready .kio-account-text small { color: var(--kio-muted); font-size: 13px; }
+
+/* Consistent content rhythm: exact same spacing and scale as Figma. */
+body.kio-ready :is(.isi, .konten, .rp-main, .finance-main, .owner14-content, .owner14-main, .page-content, .content-area, .kio-page) {
+  padding: 40px !important;
+  max-width: none;
+  min-width: 0;
+}
+body.kio-ready :is(.breadcrumb, .jejak, .rp-breadcrumb, .finance-breadcrumb, .owner14-breadcrumb, .owner14-path) {
+  color: var(--kio-muted);
+  font-size: 13px;
+  letter-spacing: .01em;
+}
+body.kio-ready h1 { color: var(--kio-ink); font-size: 28px; line-height: 1.45; font-weight: 600; }
+body.kio-ready :is(.sub, .deskripsi, .rp-subtitle, .finance-subtitle, .owner14-subtitle, .page-lead) { color: var(--kio-muted); font-size: 14px; }
+body.kio-ready :is(.kartu, .rp-card, .finance-card, .owner14-card, .main-card, .stat, .ringkas, .ringkasan, .finance-stat-card) {
+  border-radius: 12px;
+  border-color: var(--kio-line);
+}
+body.kio-ready :is(.stat, .ringkas, .finance-stat-card, .rp-stat) { background: var(--kio-paper); }
+body.kio-ready :is(.kartu, .rp-card, .finance-card, .owner14-card, .main-card) { background: var(--kio-paper); }
+body.kio-ready :is(.lencana, .rp-kost-tag, .finance-kost-tag, .owner14-tag) { border-radius: 999px; }
+body.kio-ready :is(.btn-utama, .btn-primary, .rp-btn-primary, .finance-btn-primary, .owner14-btn-primary) {
+  background: var(--kio-accent);
+  color: #fff;
+  border-color: var(--kio-accent);
+}
+body.kio-ready :is(.btn-utama, .btn-primary, .rp-btn-primary, .finance-btn-primary, .owner14-btn-primary):hover {
+  background: var(--kio-accent-hover);
+  color: #fff;
+}
+body.kio-ready :is(button, input, textarea, select) { font-family: 'Inter', Arial, sans-serif; }
+body.kio-ready :is(input:not([type='checkbox']):not([type='radio']):not([type='hidden']), select, textarea):focus-visible,
+body.kio-ready :is(a, button):focus-visible { outline: 2px solid var(--kio-blue); outline-offset: 2px; }
+body.kio-ready :is(.kartu, .rp-card, .finance-card, .owner14-card) table { width: 100%; }
+body.kio-ready :is(.kartu, .rp-card, .finance-card, .owner14-card) th { color: var(--kio-muted); font-size: 12px; font-weight: 500; }
+body.kio-ready :is(.kartu, .rp-card, .finance-card, .owner14-card) td { color: var(--kio-ink); }
+
+@media (max-width: 960px) {
+  :root { --kio-sidebar-width: 212px; }
+  body.kio-ready aside.kio-sidebar { padding: 24px 12px 18px !important; }
+  body.kio-ready :is(.isi, .konten, .rp-main, .finance-main, .owner14-content, .owner14-main, .page-content, .content-area, .kio-page) { padding: 28px !important; }
+}
+@media (max-width: 700px) {
+  body.kio-ready :is(.app, .layout, .dashboard, .rp-shell, .owner14-shell, .finance-shell),
+  body.kio-ready:has(> aside.kio-sidebar) { grid-template-columns: minmax(0, 1fr) !important; }
+  body.kio-ready aside.kio-sidebar {
+    width: 100% !important;
+    height: auto;
+    min-height: auto;
+    position: relative;
+    padding: 16px !important;
+  }
+  body.kio-ready aside.kio-sidebar > .kio-sidebar-content { min-height: auto; }
+  body.kio-ready .kio-brand strong { font-size: 22px; }
+  body.kio-ready .kio-workspace { margin-top: 12px; }
+  body.kio-ready .kio-nav { flex-direction: row; overflow-x: auto; padding-bottom: 4px; }
+  body.kio-ready .kio-nav-link { width: auto; min-width: max-content; }
+  body.kio-ready .kio-sidebar-grow, body.kio-ready .kio-help { display: none; }
+  body.kio-ready .kio-logout { margin: 8px 0 0; }
+  body.kio-ready .kio-header { padding: 0 16px !important; }
+  body.kio-ready .kio-head-path { max-width: 45%; }
+  body.kio-ready .kio-bell { display: none; }
+  body.kio-ready .kio-account-text { min-width: 0; }
+  body.kio-ready .kio-account-text strong { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  body.kio-ready :is(.isi, .konten, .rp-main, .finance-main, .owner14-content, .owner14-main, .page-content, .content-area, .kio-page) { padding: 20px !important; }
+}
+
+.kio-dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 215px), 1fr));
+  gap: 16px;
+}
+.kio-dashboard-card {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-height: 128px;
+  padding: 20px;
+  border: 1px solid var(--kio-line);
+  border-radius: var(--kio-radius);
+  color: var(--kio-ink);
+  background: var(--kio-paper);
+  text-decoration: none;
+}
+.kio-dashboard-card:hover { border-color: var(--kio-blue); }
+.kio-dashboard-card svg { color: var(--kio-accent); }
+.kio-dashboard-card strong { font-size: 16px; }
+.kio-dashboard-card span { color: var(--kio-muted); }
+
+/* Ukuran halaman ruang penghuni, dari beranda sampai keluhan. */
+body.kio-ready:has([data-kio-space="penghuni"]) {
+  scrollbar-gutter: stable;
+  --kio-page-gutter: clamp(24px, 3vw, 40px);
+  --kio-heading-size: clamp(24px, 2.2vw, 28px);
+}
+
+body.kio-ready:has([data-kio-space="penghuni"])
+  :is(.isi, .kio-page, .page-content, .owner14-content) {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  padding: var(--kio-page-gutter) !important;
+}
+
+body.kio-ready:has([data-kio-space="penghuni"])
+  :is(.isi, .kio-page, .page-content, .owner14-content)
+  > :is(.baris-judul, .judul, .heading, .page-heading, .owner14-heading) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 16px 0 8px;
+}
+
+body.kio-ready:has([data-kio-space="penghuni"])
+  :is(.baris-judul, .judul, .heading, .page-heading, .owner14-heading) > h1 {
+  margin: 0;
+  min-width: 0;
+  font-size: var(--kio-heading-size);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+body.kio-ready:has([data-kio-space="penghuni"])
+  :is(.isi, .kio-page, .page-content, .owner14-content)
+  > :is(.sub, .subtitle, .subjudul, .body.muted, .page-lead, .owner14-subtitle) {
+  margin: 0 0 24px;
+  color: var(--kio-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+body.kio-ready:has([data-kio-space="penghuni"]) .kio-header {
+  padding-inline: var(--kio-page-gutter) !important;
+}
+
+@media (max-width: 700px) {
+  body.kio-ready:has([data-kio-space="penghuni"]) {
+    --kio-page-gutter: 16px;
+  }
+
+  body.kio-ready:has([data-kio-space="penghuni"]) .kio-account {
+    gap: 8px;
+  }
+}
+
+
+/* Cadangkan ruang scrollbar halaman pendek dan panjang di posisi yang sama. */
+html:has(> body.kio-resident) {
+  overflow-y: scroll;
+}
+
+body.kio-resident:has([data-kio-space="penghuni"]) {
+  scrollbar-gutter: auto;
+}
+
+body.kio-resident :is(.isi, .kio-page, .page-content, .owner14-content)
+  > :is(.jejak, .breadcrumb, .owner14-breadcrumb, .small.muted):first-child {
+  margin: 0;
+  color: var(--kio-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+body.kio-resident .kio-search-page {
+  display: block;
+}
+
+body.kio-resident .kio-search-page .panel-cari ~ * {
+  margin-top: 24px;
+}
+
+body.kio-resident :is(.baris-judul, .judul, .page-heading, .owner14-heading)
+  > :is(.lencana, .tag, .owner14-kost-pill) {
+  display: inline-flex;
+  flex: 0 0 64px;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  width: 64px;
+  min-width: 64px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--kio-blue);
+  color: #fff;
+  font: 500 12px/1 Inter, Arial, sans-serif;
+  white-space: nowrap;
+}

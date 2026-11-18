@@ -7,11 +7,6 @@
     <style>
         * { box-sizing: border-box; }
         body { margin: 0; font-family: Arial, sans-serif; background: #f5f2ea; color: #1f2d3d; display: flex; min-height: 100vh; }
-        .sidebar { width: 240px; background: #04304f; color: #fff; padding: 20px 12px; display: flex; flex-direction: column; }
-        .sidebar .logo { font-size: 1.4rem; font-weight: bold; padding: 0 12px 20px; }
-        .sidebar a { display: block; color: #e6edf3; text-decoration: none; padding: 10px 12px; border-radius: 6px; margin-bottom: 4px; }
-        .sidebar a.aktif { background: #5a0a1e; color: #fff; }
-        .sidebar .keluar { margin-top: auto; }
         .main { flex: 1; display: flex; flex-direction: column; }
         .header { background: #fff; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
         .konten { padding: 24px; }
@@ -46,25 +41,18 @@
         .error-teks { color: #b00020; font-size: 0.85rem; margin-top: 4px; }
         .foto-preview { width: 220px; border-radius: 8px; margin-top: 8px; }
     </style>
+    @include('layouts.partials.kostio-ui-assets')
 </head>
-<body>
-    <aside class="sidebar">
-        <div class="logo">kost.io</div>
-        <a href="#">Kelola Kost</a>
-        <a href="#" class="aktif">Kelola Kamar</a>
-        <a href="#">Pengajuan Sewa</a>
-        <a href="#">Data Penghuni</a>
-        <a href="#">Verifikasi Pembayaran</a>
-        <a href="#">Keluhan / Kerusakan</a>
-        <a href="#">Laporan Keuangan</a>
-        <a href="#" class="keluar">Keluar</a>
+<body class="kio-ready kio-owner">
+    @include('layouts.partials.kostio-ui-shell', ['kioRenderServer' => true])
+    <aside class="sidebar kio-sidebar">
+        @yield('kioResidentSidebar')
     </aside>
 
     <div class="main">
-        <div class="header">
-            <div>Kost.io / Pemilik Kost</div>
-            <div>Pemilik Kost</div>
-        </div>
+        <header class="header kio-header">
+            @yield('kioResidentHeader')
+        </header>
 
         <div class="konten">
             @if (session('pesan'))

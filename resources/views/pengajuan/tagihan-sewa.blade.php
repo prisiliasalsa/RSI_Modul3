@@ -301,47 +301,21 @@
             .kartu { padding: 18px; }
         }
     </style>
+    @include('layouts.partials.kostio-ui-assets')
 </head>
-<body>
+<body class="kio-ready kio-resident">
+    @include('layouts.partials.kostio-ui-shell', ['kioRenderServer' => true])
 <div class="app">
-    <aside class="sidebar">
-        <div class="logo">kost.io</div>
-
-        <div class="sidebar-box">
-            <small>RUANG PENGHUNI</small>
-            <strong>Temukan nyamannya</strong>
-        </div>
-
-        <nav aria-label="Menu tagihan">
-            <a class="nav-link" href="{{ route('tagihan-sewa.index') }}" aria-current="page">
-                Tagihan Sewa
-            </a>
-
-            @if ($peran === 'Penghuni' && \Illuminate\Support\Facades\Route::has('keluhan.status'))
-                <a class="nav-link" href="{{ route('keluhan.status') }}">Keluhan Saya</a>
-            @elseif ($peran === 'Calon Penghuni')
-                <a class="nav-link" href="{{ route('pengajuan.status') }}">Status Pengajuan</a>
-            @endif
-        </nav>
-
-        <div class="sidebar-spacer"></div>
-
-        <div class="sidebar-box">
-            <strong>Butuh bantuan?</strong>
-            <small>Kelola tempat tinggal dengan lebih tenang.</small>
-        </div>
-    </aside>
+    <aside class="sidebar kio-sidebar">
+            @yield('kioResidentSidebar')
+        </aside>
 
     <div>
-        <header class="topbar">
-            <span>Kost.io / {{ $peran }}</span>
-            <div class="profil">
-                <strong>{{ $nama }}</strong>
-                <span>{{ $peran }}</span>
-            </div>
+        <header class="topbar kio-header">
+            @yield('kioResidentHeader')
         </header>
 
-        <main>
+        <main class="kio-page">
             <p class="jejak">BERANDA / MELIHAT TAGIHAN &amp; MENGUNGGAH BUKTI BAYAR</p>
 
             <div class="baris-judul">

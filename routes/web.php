@@ -52,6 +52,22 @@ Route::get('/login', [LoginController::class, 'pilihMenuLogin'])
 Route::post('/login', [LoginController::class, 'login'])
     ->name('login.proses');
 
+Route::get('/dashboard', function (\Illuminate\Http\Request $request) {
+    if (!$request->session()->has('idAkun')) {
+        return redirect()->route('login');
+    }
+
+    $peran = $request->session()->get('jenisAkun');
+
+    if ($peran === 'Pemilik Kost') {
+        return redirect()->route('kost.daftar');
+    }
+
+    abort_unless(in_array($peran, ['Calon Penghuni', 'Penghuni'], true), 403);
+
+    return redirect()->route('kost.cari');
+})->name('penghuni.dashboard');
+
 /*
 |--------------------------------------------------------------------------
 | UC-03: Cari Kost
@@ -185,3 +201,10 @@ require __DIR__ . '/data-penghuni.php';
 
 // UC-13: Memverifikasi Pembayaran
 require __DIR__ . '/verifikasi-pembayaran.php';
+
+/* Keluar dari akun Kost.io (session-based login) */
+Route::post('/logout', function (\Illuminate\Http\Request $request) {
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return redirect()->route('login');
+})->name('logout');

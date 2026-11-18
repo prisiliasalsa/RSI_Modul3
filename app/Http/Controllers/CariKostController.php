@@ -36,8 +36,8 @@ class CariKostController extends Controller
             return redirect()->route('login');
         }
 
-        if ($peran !== 'Calon Penghuni') {
-            abort(403, 'Halaman khusus Calon Penghuni.');
+        if (!in_array($peran, ['Calon Penghuni', 'Penghuni'], true)) {
+            abort(403, 'Halaman khusus Calon Penghuni dan Penghuni.');
         }
 
         $akun = DB::table('akun')

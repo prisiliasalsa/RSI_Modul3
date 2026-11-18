@@ -4,7 +4,7 @@
     $fields = [
         'jenisAkun'           => ['label' => 'Jenis akun',            'type' => 'select'],
         'nama'                => ['label' => 'Nama lengkap',          'type' => 'text',     'ph' => 'Nama lengkap',   'max' => 100, 'ac' => 'name'],
-        'email'               => ['label' => 'Email',                 'type' => 'email',    'ph' => 'nama@email.com', 'max' => 254, 'ac' => 'email'],
+        'email'               => ['label' => 'Email',                 'type' => 'email',    'ph' => 'nama@gmail.com', 'max' => 254, 'ac' => 'email'],
         'noTelepon'           => ['label' => 'Nomor telepon',         'type' => 'tel',      'ph' => '08xxxxxxxxxx',   'max' => 20,  'ac' => 'tel'],
         'kataSandi'           => ['label' => 'Kata sandi',            'type' => 'password', 'ph' => 'Kata sandi',      'ac' => 'new-password'],
         'konfirmasiKataSandi' => ['label' => 'Konfirmasi kata sandi', 'type' => 'password', 'ph' => 'Ulangi kata sandi', 'ac' => 'new-password'],
@@ -102,6 +102,7 @@
             .grid { grid-template-columns: 1fr; }
         }
     </style>
+    @include('layouts.partials.kostio-ui-assets')
 </head>
 <body>
 <div class="page">
@@ -218,5 +219,6 @@
         </div>
     </main>
 </div>
+    @include('layouts.partials.kostio-ui-shell')
 </body>
 </html>

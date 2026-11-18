@@ -199,7 +199,7 @@
                 <div class="owner14-field">
 
                     <label for="pertanyaanTambahan">
-                        Pertanyaan tambahan (opsional)
+                        Pertanyaan tambahan untuk penghuni
                     </label>
 
                     <textarea
@@ -208,9 +208,14 @@
                         form="uc14FormInfo"
                         rows="3"
                         maxlength="500"
-                        placeholder="Kebocoran ada di keran atau pipa?"
+                        placeholder="Contoh: Bagian dinding mana yang retak?"
+                        required
+                        aria-describedby="uc14InfoHint"
                     >{{ old('pertanyaanTambahan', $info['pertanyaan'] ?? '') }}</textarea>
 
+                    <small id="uc14InfoHint">
+                        Wajib diisi saat memilih Minta informasi. Untuk mengubah status saja, pilih Simpan status.
+                    </small>
                 </div>
 
                 <div class="owner14-field">

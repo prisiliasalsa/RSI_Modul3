@@ -62,6 +62,35 @@
             background: white;
         }
 
+        .password-field {
+            position: relative;
+        }
+
+        .password-field input {
+            padding-right: 48px;
+        }
+
+        .password-field .password-toggle {
+            position: absolute;
+            inset: 0 2px 0 auto;
+            display: grid;
+            place-items: center;
+            width: 44px;
+            padding: 0;
+            color: #536572;
+            background: transparent;
+        }
+
+        .password-field .password-toggle[hidden],
+        .password-toggle[aria-pressed="false"] .eye-slash {
+            display: none;
+        }
+
+        .password-toggle:focus-visible {
+            outline: 2px solid #680e26;
+            outline-offset: -3px;
+        }
+
         button {
             border: 0;
             background: #680e26;
@@ -89,6 +118,7 @@
             .halaman { grid-template-columns: 1fr; }
         }
     </style>
+    @include('layouts.partials.kostio-ui-assets')
 </head>
 <body>
     <main class="halaman">
@@ -136,13 +166,26 @@
 
                     <div class="field">
                         <label for="kata_sandi">Kata sandi</label>
-                        <input
-                            type="password"
-                            id="kata_sandi"
-                            name="kata_sandi"
-                            autocomplete="current-password"
-                            required
-                        >
+                        <div class="password-field">
+                            <input
+                                type="password"
+                                id="kata_sandi"
+                                name="kata_sandi"
+                                autocomplete="current-password"
+                                required
+                            >
+                            <button type="button" class="password-toggle" id="password-toggle"
+                                    aria-controls="kata_sandi" aria-label="Tampilkan kata sandi"
+                                    aria-pressed="false" hidden>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+                                     stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6Z"/>
+                                    <circle cx="12" cy="12" r="2.5"/>
+                                    <path class="eye-slash" d="m3 3 18 18"/>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="field">
@@ -170,5 +213,20 @@
             </div>
         </section>
     </main>
+    @include('layouts.partials.kostio-ui-shell')
+    <script>
+        (() => {
+            const password = document.getElementById('kata_sandi');
+            const toggle = document.getElementById('password-toggle');
+
+            toggle.addEventListener('click', () => {
+                const visible = password.type === 'password';
+                password.type = visible ? 'text' : 'password';
+                toggle.setAttribute('aria-pressed', String(visible));
+            });
+
+            toggle.hidden = false;
+        })();
+    </script>
 </body>
 </html>

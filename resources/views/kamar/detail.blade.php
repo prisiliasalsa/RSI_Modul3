@@ -443,118 +443,24 @@ $inisialAkun = substr($inisialAkun, 0, 2);
     }
 }
     </style>
+    @include('layouts.partials.kostio-ui-assets')
 </head>
 
-<body>
+<body class="kio-ready kio-resident">
+    @include('layouts.partials.kostio-ui-shell', ['kioRenderServer' => true])
 <div class="layout">
 
-    <aside class="sidebar">
-
-    <div class="logo">
-        <svg width="20" height="20" viewBox="0 0 24 24"
-            fill="none" stroke="#E2D8CB" stroke-width="1.8"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>
-        </svg>
-        <span>kost.io</span>
-    </div>
-
-    <div class="workspace">
-        <span class="small light">RUANG PENGHUNI</span>
-        <span class="label white">Temukan nyamannya</span>
-    </div>
-
-    <nav class="menu">
-
-        <a href="{{ route('kost.cari') }}"
-            class="nav-item active">
-
-            <svg width="20" height="20" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" stroke-width="1.8"
-                stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="7"/>
-                <path d="M21 21l-4.3-4.3"/>
-            </svg>
-
-            <span>Cari Kost</span>
-        </a>
-
-        <a href="#" class="nav-item">
-
-            <svg width="20" height="20" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" stroke-width="1.8"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
-                <path d="M14 3v5h5"/>
-            </svg>
-
-            <span>Status Pengajuan</span>
-        </a>
-
-    </nav>
-
-    <div class="spacer"></div>
-
-    <div class="bantuan">
-        <span class="label white">Butuh bantuan?</span>
-        <span class="small light">
-            Kelola tempat tinggal dengan lebih tenang.
-        </span>
-    </div>
-
-    <a href="#" class="nav-item">
-
-        <svg width="20" height="20" viewBox="0 0 24 24"
-            fill="none" stroke="currentColor" stroke-width="1.8"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <path d="M16 17l5-5-5-5"/>
-            <path d="M21 12H9"/>
-        </svg>
-
-        <span>Keluar</span>
-    </a>
-
-</aside>
+    <aside class="sidebar kio-sidebar">
+            @yield('kioResidentSidebar')
+        </aside>
 
     <main class="main">
 
-        <header class="topbar">
+        <header class="topbar kio-header">
+            @yield('kioResidentHeader')
+        </header>
 
-    <span class="small muted grow">
-        Kost.io &nbsp;/&nbsp; <?= eKamar($jenisAkun) ?>
-    </span>
-
-    <svg width="22" height="22"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="#5B6871"
-        stroke-width="1.8"
-        stroke-linecap="round"
-        stroke-linejoin="round">
-
-        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
-        <path d="M13.7 21a2 2 0 0 1-3.4 0"/>
-
-    </svg>
-
-    <div class="avatar">
-        <?= eKamar($inisialAkun) ?>
-    </div>
-
-    <div class="akun">
-        <span class="label navy">
-            <?= eKamar($namaAkun) ?>
-        </span>
-
-        <span class="small muted">
-            <?= eKamar($jenisAkun) ?>
-        </span>
-    </div>
-
-</header>
-
-        <section class="content">
+        <section class="content kio-page">
 
             <div class="breadcrumb">
                 BERANDA / MELIHAT DETAIL KAMAR KOST
