@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Storage;
 
 class CariKostController extends Controller
 {
-    // Pilihan filter sesuai UC-03 asli
     public const OPSI_HARGA = [
         '' => 'Semua harga',
         '0-500000' => 'Di bawah Rp500.000',
@@ -17,16 +16,15 @@ class CariKostController extends Controller
     ];
 
     public const OPSI_TIPE = [
-        'Putra', 'Putri', 'Campur'
+        'Putra', 'Putri', 'Campur',
     ];
 
     public const OPSI_FASILITAS = [
         'Wi-Fi', 'AC', 'Kamar mandi dalam',
         'Lemari', 'Meja belajar',
-        'Parkir', 'Dapur bersama'
+        'Parkir', 'Dapur bersama',
     ];
 
-    // UC-03: Membuka menu Cari Kost
     public function index(Request $request)
     {
         $idAkun = $request->session()->get('idAkun');
@@ -46,7 +44,7 @@ class CariKostController extends Controller
 
         if (!$akun) {
             $request->session()->forget([
-                'idAkun', 'idPenghuni', 'jenisAkun'
+                'idAkun', 'idPenghuni', 'jenisAkun',
             ]);
 
             return redirect()->route('login');
@@ -58,7 +56,7 @@ class CariKostController extends Controller
             'jenisAkun' => $peran,
         ];
 
-        // Membaca kriteria pencarian dari GET
+        // Membaca kriteria pencarian.
         $kataKunci = mb_substr(
             trim((string) $request->query('q', '')),
             0,
@@ -71,19 +69,36 @@ class CariKostController extends Controller
 
         $kriteria = [
             'kataKunci' => $kataKunci,
-            'rentangHarga' => array_key_exists(
-                $harga, self::OPSI_HARGA
-            ) ? $harga : '',
-            'tipeKost' => in_array(
-                $tipe, self::OPSI_TIPE, true
-            ) ? $tipe : '',
-            'fasilitas' => in_array(
-                $fasilitas, self::OPSI_FASILITAS, true
-            ) ? $fasilitas : '',
+            'rentangHarga' => array_key_exists($harga, self::OPSI_HARGA)
+                ? $harga
+                : '',
+            'tipeKost' => in_array($tipe, self::OPSI_TIPE, true)
+                ? $tipe
+                : '',
+            'fasilitas' => in_array($fasilitas, self::OPSI_FASILITAS, true)
+                ? $fasilitas
+                : '',
         ];
 
-        // Mengambil kost yang dipublikasikan
-        $query = DB::table('kost')
+        // Mengambil harga kamar termurah untuk setiap kost.
+        $hargaKamar = DB::table('kamar')
+            ->select('idKost')
+            ->selectRaw('MIN(hargaSewa) AS hargaKamarMulai')
+            ->groupBy('idKost');
+
+        // Subquery agar harga hasil perhitungan dapat difilter dan diurutkan.
+        $query = DB::query()
+            ->fromSub(
+                DB::table('kost as k')
+                    ->leftJoinSub($hargaKamar, 'hk', function ($join) {
+                        $join->on('hk.idKost', '=', 'k.idKost');
+                    })
+                    ->select('k.*')
+                    ->selectRaw(
+                        'COALESCE(hk.hargaKamarMulai, 0) AS hargaKamarMulai'
+                    ),
+                'hasil'
+            )
             ->where('status', 'Dipublikasikan');
 
         if ($kriteria['kataKunci'] !== '') {
@@ -91,8 +106,8 @@ class CariKostController extends Controller
 
             $query->where(function ($q) use ($keyword) {
                 $q->where('namaKost', 'like', "%{$keyword}%")
-                  ->orWhere('alamat', 'like', "%{$keyword}%")
-                  ->orWhere('lokasi', 'like', "%{$keyword}%");
+                    ->orWhere('alamat', 'like', "%{$keyword}%")
+                    ->orWhere('lokasi', 'like', "%{$keyword}%");
             });
         }
 
@@ -104,19 +119,16 @@ class CariKostController extends Controller
             );
 
             if ($min !== '') {
-                $query->where('hargaMulai', '>=', (int) $min);
+                $query->where('hargaKamarMulai', '>=', (int) $min);
             }
 
             if ($max !== '') {
-                $query->where('hargaMulai', '<=', (int) $max);
+                $query->where('hargaKamarMulai', '<=', (int) $max);
             }
         }
 
         if ($kriteria['tipeKost'] !== '') {
-            $query->where(
-                'tipeKost',
-                $kriteria['tipeKost']
-            );
+            $query->where('tipeKost', $kriteria['tipeKost']);
         }
 
         if ($kriteria['fasilitas'] !== '') {
@@ -128,12 +140,12 @@ class CariKostController extends Controller
         }
 
         $daftarKost = $query
-            ->orderBy('hargaMulai')
+            ->orderBy('hargaKamarMulai')
             ->get()
             ->map(fn ($item) => new KartuKostUC03($item))
             ->all();
 
-        // Adapter agar tampilan PHP asli tetap bisa digunakan
+        // Adapter untuk tampilan UC-03.
         $kontrol = new class($kriteria, $daftarKost) {
             public function __construct(
                 private array $kriteria,
@@ -174,7 +186,7 @@ class CariKostController extends Controller
     }
 }
 
-// Adapter data untuk method tampilan UC-03 asli
+// Adapter data untuk tampilan kartu kost.
 class KartuKostUC03
 {
     public function __construct(
@@ -208,7 +220,7 @@ class KartuKostUC03
 
     public function getHargaMulai(): float
     {
-        return (float) ($this->data->hargaMulai ?? 0);
+        return (float) ($this->data->hargaKamarMulai ?? 0);
     }
 
     public function getDaftarFasilitas(): array
@@ -224,9 +236,7 @@ class KartuKostUC03
 
     public function getFotoUtama(): ?string
     {
-        $foto = trim((string) (
-            $this->data->fotoUtama ?? ''
-        ));
+        $foto = trim((string) ($this->data->fotoUtama ?? ''));
 
         if ($foto === '') {
             return null;
