@@ -20,8 +20,8 @@ class DetailKostController extends Controller
         $jenisAkun = (string) $request->session()
             ->get('jenisAkun', '');
 
-        if ($jenisAkun !== 'Calon Penghuni') {
-            abort(403, 'Halaman khusus Calon Penghuni.');
+        if (!in_array($jenisAkun, ['Calon Penghuni', 'Penghuni'], true)) {
+            abort(403, 'Halaman khusus Calon Penghuni dan Penghuni.');
         }
 
         $akun = DB::table('akun')

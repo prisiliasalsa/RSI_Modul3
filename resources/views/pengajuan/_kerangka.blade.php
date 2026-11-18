@@ -98,55 +98,29 @@
             th, td { padding-left: 14px; padding-right: 14px; }
         }
     </style>
+    @include('layouts.partials.kostio-ui-assets')
 </head>
-<body>
+<body class="kio-ready kio-resident">
+    @include('layouts.partials.kostio-ui-shell', ['kioRenderServer' => true])
 <div class="app">
 
     <!-- Sidebar Ruang Penghuni -->
-    <aside class="sb">
-        <div class="brand">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V21H3z"/><path d="M9 21v-7h6v7"/></svg>
-            kost.io
-        </div>
-        <div class="kotak"><small>RUANG PENGHUNI</small><strong>Temukan nyamannya</strong></div>
-
-        <a class="menu" href="{{ url('/cari-kost') }}">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-            Cari Kost
-        </a>
-        <a class="menu aktif" href="{{ route('pengajuan.status', $qs) }}">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg>
-            Status Pengajuan
-        </a>
-
-        <div class="spasi"></div>
-        <div class="kotak"><strong>Butuh bantuan?</strong><span>Kelola tempat tinggal dengan lebih tenang.</span></div>
-        <a class="menu" href="{{ url('/logout') }}">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/></svg>
-            Keluar
-        </a>
-    </aside>
+    <aside class="sb kio-sidebar">
+            @yield('kioResidentSidebar')
+        </aside>
 
     <div class="area">
-        <header class="top">
-            <div>Kost.io &nbsp;/&nbsp; Calon Penghuni</div>
-            <div class="user">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5f6b76" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>
-                <div class="avatar">{{ $pengguna['inisial'] }}</div>
-                <div>
-                    <div class="nama">{{ $pengguna['nama'] }}</div>
-                    <div class="peran">{{ $pengguna['peran'] }}</div>
-                </div>
-            </div>
+        <header class="top kio-header">
+            @yield('kioResidentHeader')
         </header>
 
         <main class="isi">
-            <div class="jejak">BERANDA / @yield('jejak')</div>
+            <div class="jejak">BERANDA @hasSection('jejak') / @yield('jejak') @endif</div>
             <div class="baris-judul">
                 <h1>@yield('heading')</h1>
                 <span class="lencana">Kost.io</span>
             </div>
-            <p class="sub">Pantau perkembangan dan keputusan pengajuan sewamu.</p>
+            <p class="sub">@yield('subjudul', 'Pantau perkembangan dan keputusan pengajuan sewamu.')</p>
 
             @yield('konten')
         </main>

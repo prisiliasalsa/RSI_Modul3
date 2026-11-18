@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notifikasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -99,6 +100,12 @@ class KontrolPengajuanSewa extends Controller
                     'status' => 'Menunggu Verifikasi',
                     'tanggalPengajuan' => now()->toDateString(),
                 ]);
+
+                Notifikasi::catatPengajuan(
+                    $idPengajuan,
+                    'Ada pengajuan sewa baru untuk kamar ' . $kamar->nomorKamar . '.',
+                    (int) $kamar->idPemilik
+                );
             }, 3);
         } catch (Throwable $error) {
             if (is_string($berkas)) {
@@ -131,6 +138,6 @@ class KontrolPengajuanSewa extends Controller
             ->where('m.idKamar', $idKamar)
             ->where('m.statusKamar', 'Tersedia')
             ->where('k.status', 'Dipublikasikan')
-            ->select('m.idKamar', 'm.idKost', 'm.nomorKamar', 'm.hargaSewa', 'k.namaKost');
+            ->select('m.idKamar', 'm.idKost', 'm.nomorKamar', 'm.hargaSewa', 'k.namaKost', 'k.idPemilik');
     }
 }

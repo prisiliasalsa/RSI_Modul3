@@ -34,119 +34,25 @@
         src="{{ asset('assets/kostio/keluhan.js') }}"
         defer
     ></script>
+    @include('layouts.partials.kostio-ui-assets')
 </head>
 
-<body>
+<body class="kio-ready kio-resident">
+    @include('layouts.partials.kostio-ui-shell', ['kioRenderServer' => true])
 
 <div class="dashboard">
 
     {{-- SIDEBAR PENGHUNI --}}
-    <aside class="sidebar">
-
-        <div class="brand">
-            @include('keluhan.partials.icon', [
-                'name' => 'home',
-                'size' => 20
-            ])
-
-            <strong>kost.io</strong>
-        </div>
-
-        <div class="workspace">
-            <small>RUANG PENGHUNI</small>
-            <span>Temukan nyamannya</span>
-        </div>
-
-        <nav class="sidebar-nav" aria-label="Menu penghuni">
-
-            <span class="nav-item muted">
-                @include('keluhan.partials.icon', [
-                    'name' => 'wallet'
-                ])
-
-                <span>Tagihan Sewa</span>
-            </span>
-
-            <a
-                href="{{ route('keluhan.status') }}"
-                class="nav-item active"
-            >
-                @include('keluhan.partials.icon', [
-                    'name' => 'chat'
-                ])
-
-                <span>Keluhan Saya</span>
-            </a>
-
-        </nav>
-
-        <div class="sidebar-bottom">
-
-            <div class="sidebar-help">
-                <strong>Butuh bantuan?</strong>
-
-                <p>
-                    Kelola tempat tinggal dengan lebih tenang.
-                </p>
-            </div>
-
-            <div class="nav-footer">
-                @include('keluhan.partials.icon', [
-                    'name' => 'logout'
-                ])
-
-                <span>Keluar</span>
-            </div>
-
-        </div>
-
-    </aside>
+    <aside class="sidebar kio-sidebar">
+            @yield('kioResidentSidebar')
+        </aside>
 
     {{-- AREA UTAMA --}}
     <div class="main-panel">
 
         {{-- HEADER --}}
-        <header class="topbar">
-
-            <div class="topbar-path">
-                Kost.io <span>/</span> Penghuni
-            </div>
-
-            <div class="topbar-user">
-
-                <span class="bell">
-                    @include('keluhan.partials.icon', [
-                        'name' => 'bell',
-                        'size' => 22
-                    ])
-                </span>
-
-                @php
-                    $nama = trim(
-                        (string) (
-                            $penghuni->namaLengkap ?? 'Penghuni'
-                        )
-                    );
-
-                    $kataNama = preg_split('/\s+/', $nama);
-
-                    $inisial = implode('', array_map(
-                        fn ($kata) => mb_substr($kata, 0, 1),
-                        array_slice($kataNama, 0, 2)
-                    ));
-                @endphp
-
-                <span class="avatar">
-                    {{ strtoupper($inisial ?: 'P') }}
-                </span>
-
-                <div class="user-text">
-                    <strong>{{ $nama }}</strong>
-                    <small>Penghuni</small>
-                </div>
-
-            </div>
-
+        <header class="topbar kio-header">
+            @yield('kioResidentHeader')
         </header>
 
         {{-- KONTEN HALAMAN --}}

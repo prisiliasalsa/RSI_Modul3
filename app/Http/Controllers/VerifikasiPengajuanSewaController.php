@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notifikasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -73,7 +74,8 @@ return view('pengajuan.verifikasi-pemilik', [
                 'p.tanggalMulaiSewa',
                 'p.durasiSewa',
                 'p.status',
-                'm.hargaSewa'
+                'm.hargaSewa',
+                'm.statusKamar'
             )
             ->lockForUpdate()
             ->first();
@@ -83,6 +85,8 @@ return view('pengajuan.verifikasi-pemilik', [
         if (!in_array($pengajuan->status, ['Menunggu', 'Menunggu Verifikasi'], true)) {
             return false;
         }
+
+        $idPenghuni = null;
 
         if ($data['keputusan'] === 'Disetujui') {
             if (!$pengajuan->tanggalMulaiSewa || $pengajuan->hargaSewa === null) {
@@ -94,12 +98,27 @@ return view('pengajuan.verifikasi-pemilik', [
             $tanggalMulai = \Illuminate\Support\Carbon::parse($pengajuan->tanggalMulaiSewa);
             $periode = $tanggalMulai->format('Y-m');
 
-            $sudahAda = DB::table('tagihansewa')
+            $tagihan = DB::table('tagihansewa')
                 ->where('idPengajuan', $idPengajuan)
                 ->where('periode', $periode)
+                ->first(['idPenghuni']);
+
+            $adaSewaLain = DB::table('penghuni')
+                ->where('idKamar', $pengajuan->idKamar)
+                ->where('idKost', $pengajuan->idKost)
+                ->whereIn('status', ['Aktif', 'Menunggu Pembayaran'])
+                ->when($tagihan?->idPenghuni, fn ($query, $id) =>
+                    $query->where('idPenghuni', '!=', $id)
+                )
                 ->exists();
 
-            if (!$sudahAda) {
+            if ($pengajuan->statusKamar !== 'Tersedia' || $adaSewaLain) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'keputusan' => 'Kamar sudah tidak tersedia untuk pengajuan ini.',
+                ]);
+            }
+
+            if (!$tagihan) {
                 $akun = DB::table('akun')
                     ->where('idAkun', $pengajuan->idCalonPenghuni)
                     ->first(['namaLengkap', 'noTelepon']);
@@ -141,7 +160,14 @@ return view('pengajuan.verifikasi-pemilik', [
                     'jatuhTempo' => $tanggalMulai->toDateString(),
                     'status' => 'Belum Dibayar',
                 ]);
+            } else {
+                $idPenghuni = $tagihan->idPenghuni;
             }
+
+            DB::table('kamar')
+                ->where('idKost', $pengajuan->idKost)
+                ->where('idKamar', $pengajuan->idKamar)
+                ->update(['statusKamar' => 'Terisi']);
         }
 
         DB::table('pengajuansewa')
@@ -152,6 +178,14 @@ return view('pengajuan.verifikasi-pemilik', [
                     ? $data['alasanPenolakan']
                     : null,
             ]);
+
+        Notifikasi::catatPengajuan(
+            $idPengajuan,
+            $data['keputusan'] === 'Disetujui'
+                ? 'Pengajuan sewa disetujui. Tagihan sewa sudah tersedia.'
+                : 'Pengajuan sewa ditolak. Alasan: ' . $data['alasanPenolakan'],
+            idPenghuni: $idPenghuni
+        );
 
         return true;
     }, 3);

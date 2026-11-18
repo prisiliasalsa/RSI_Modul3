@@ -16,17 +16,6 @@
         <a class="rp-btn rp-btn-primary" href="{{ route('pemilik.verifikasi.daftar') }}">Muat ulang</a>
     </section>
 
-@elseif ($jumlahMenunggu === 0)
-
-    {{-- Alternative Flow 1 (2a): belum ada pembayaran --}}
-    <section class="rp-card rp-empty" aria-live="polite">
-        <div class="rp-empty-icon">
-            @include('keluhan.pemilik.icon', ['name' => 'wallet', 'size' => 34])
-        </div>
-        <h2>Belum ada pembayaran yang perlu diverifikasi</h2>
-        <p>Pembayaran yang dikirim penghuni akan muncul di halaman ini.</p>
-    </section>
-
 @else
 
     {{-- Panel ringkasan --}}
@@ -102,7 +91,9 @@
                     @empty
                         <tr>
                             <td colspan="5" class="rp-no-match">
-                                Tidak ada pembayaran yang sesuai dengan pencarian.
+                                {{ $jumlahMenunggu === 0
+                                    ? 'Belum ada pembayaran yang perlu diverifikasi.'
+                                    : 'Tidak ada pembayaran yang sesuai dengan pencarian.' }}
                             </td>
                         </tr>
                     @endforelse

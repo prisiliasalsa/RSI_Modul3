@@ -16,6 +16,27 @@ class Notifikasi extends Model
     public $incrementing = false;
     public $timestamps = false;
 
+    public static function catatPengajuan(
+        int $idPengajuan,
+        string $pesan,
+        ?int $idPemilikKost = null,
+        ?int $idPenghuni = null
+    ): void {
+        $idNotifikasi = (int) DB::table('notifikasi')
+            ->lockForUpdate()
+            ->max('idNotifikasi') + 1;
+
+        DB::table('notifikasi')->insert([
+            'idNotifikasi' => $idNotifikasi,
+            'idPemilikKost' => $idPemilikKost,
+            'idPenghuni' => $idPenghuni,
+            'idPengajuan' => $idPengajuan,
+            'pesan' => $pesan,
+            'waktuKirim' => now(),
+            'status' => 'Belum Dibaca',
+        ]);
+    }
+
     /** kirimNotif(idPembayaran, pesan): notifikasi ke penghuni pembayar. */
     public static function kirimNotif(int $idPembayaran, string $pesan): bool
     {

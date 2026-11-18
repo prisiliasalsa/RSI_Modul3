@@ -215,7 +215,7 @@ class KontrolVerifikasiPembayaran extends Controller
                         ->exists();
 
                     if (
-                        $kamar->statusKamar !== 'Tersedia' ||
+                        !in_array($kamar->statusKamar, ['Tersedia', 'Terisi'], true) ||
                         $penghuniAktifLain
                     ) {
                         throw new RuntimeException(
@@ -230,7 +230,7 @@ class KontrolVerifikasiPembayaran extends Controller
                             'status' => 'Aktif'
                         ]);
 
-                    // Mengubah status kamar menjadi terisi
+                    // Menangani pengajuan lama yang disetujui saat kamar masih Tersedia
                     DB::table('kamar')
                         ->where('idKamar', $kamar->idKamar)
                         ->update([

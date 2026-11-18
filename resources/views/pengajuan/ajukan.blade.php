@@ -270,39 +270,21 @@
             h1, .preview h2 { font-size: 24px; }
         }
     </style>
+    @include('layouts.partials.kostio-ui-assets')
 </head>
-<body>
+<body class="kio-ready kio-resident">
+    @include('layouts.partials.kostio-ui-shell', ['kioRenderServer' => true])
 <div class="app">
-    <aside class="sidebar">
-        <div class="logo">kost.io</div>
-
-        <div class="sidebar-box">
-            <small>RUANG PENGHUNI</small>
-            <strong>Temukan nyamannya</strong>
-        </div>
-
-        <nav aria-label="Menu calon penghuni">
-            <a class="nav-link aktif" href="{{ route('kost.cari') }}">Cari Kost</a>
-            <a class="nav-link" href="{{ route('pengajuan.status') }}">Status Pengajuan</a>
-        </nav>
-
-        <div class="sidebar-spacer"></div>
-
-        <div class="sidebar-box bantuan">
-            <strong>Butuh bantuan?</strong>
-            <small>Kelola tempat tinggal dengan lebih tenang.</small>
-        </div>
-    </aside>
+    <aside class="sidebar kio-sidebar">
+            @yield('kioResidentSidebar')
+        </aside>
 
     <div>
-        <header class="topbar">
-            <span>Kost.io / Calon Penghuni</span>
-            @if ($namaPemohon)
-                <span>{{ $namaPemohon }}</span>
-            @endif
+        <header class="topbar kio-header">
+            @yield('kioResidentHeader')
         </header>
 
-        <main>
+        <main class="kio-page">
             <p class="jejak">BERANDA / MENGAJUKAN SEWA</p>
 
             <div class="judul">
