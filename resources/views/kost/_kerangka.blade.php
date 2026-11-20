@@ -133,49 +133,27 @@
             th, td { padding-left: 14px; padding-right: 14px; }
         }
     </style>
+    @include('layouts.partials.kostio-ui-assets')
 </head>
-<body>
+<body class="kio-ready kio-owner">
+    @include('layouts.partials.kostio-ui-shell', ['kioRenderServer' => true])
 <div class="app">
 
     <!-- Sidebar Ruang Pemilik -->
-    <aside class="sb">
-        <div class="brand">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V21H3z"/><path d="M9 21v-7h6v7"/></svg>
-            kost.io
-        </div>
-        <div class="kotak"><small>RUANG PEMILIK</small><strong>Kelola hunianmu</strong></div>
-
-        <a class="menu aktif" href="{{ route('kost.daftar', $qs) }}">Kelola Kost</a>
-        <a class="menu" href="{{ url('/kelola-kamar') }}">Kelola Kamar</a>
-        <a class="menu" href="{{ url('/pengajuan-sewa') }}">Pengajuan Sewa</a>
-        <a class="menu" href="{{ url('/data-penghuni') }}">Data Penghuni</a>
-        <a class="menu" href="{{ url('/verifikasi-pembayaran') }}">Verifikasi Pembayaran</a>
-        <a class="menu" href="{{ url('/keluhan-pemilik') }}">Keluhan / Kerusakan</a>
-        <a class="menu" href="{{ url('/laporan-keuangan') }}">Laporan Keuangan</a>
-
-        <div class="spasi"></div>
-        <div class="kotak"><strong>Butuh bantuan?</strong><span>Kelola tempat tinggal dengan lebih tenang.</span></div>
-        <a class="menu" href="{{ url('/logout') }}">Keluar</a>
+    <aside class="sb kio-sidebar">
+        @yield('kioResidentSidebar')
     </aside>
 
     <div class="area">
-        <header class="top">
-            <div>Kost.io &nbsp;/&nbsp; Pemilik Kost</div>
-            <div class="user">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5f6b76" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>
-                <div class="avatar">{{ $pengguna['inisial'] }}</div>
-                <div>
-                    <div class="nama">{{ $pengguna['nama'] }}</div>
-                    <div class="peran">{{ $pengguna['peran'] }}</div>
-                </div>
-            </div>
+        <header class="top kio-header">
+            @yield('kioResidentHeader')
         </header>
 
         <main class="isi">
             <div class="jejak">BERANDA / MENGELOLA &amp; PUBLIKASI DATA KOST</div>
             <div class="baris-judul">
                 <h1>@yield('heading')</h1>
-                <span class="lencana" id="lencana">{{ $lencana }}</span>
+                @include('layouts.partials.lencana-kost-pemilik', ['namaLencana' => $lencana, 'idLencana' => 'lencana'])
             </div>
             <p class="sub">Atur informasi hunian dan tampilkan kepada calon penghuni.</p>
 

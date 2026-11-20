@@ -9,7 +9,10 @@
 
 @section('isi')
     <div class="breadcrumb">Beranda / Mengelola Data Kamar</div>
-    <h1>{{ $ubah ? 'Ubah kamar ' . $kamar->nomor_kamar : 'Tambah kamar' }}</h1>
+    <div class="kio-owner-title">
+        <h1>{{ $ubah ? 'Ubah kamar ' . $kamar->nomor_kamar : 'Tambah kamar' }}</h1>
+        @include('layouts.partials.lencana-kost-pemilik', ['namaLencana' => $kost->nama_kost])
+    </div>
     <p class="deskripsi">Kelola detail, harga, dan ketersediaan setiap kamar.</p>
 
     <div class="kartu">

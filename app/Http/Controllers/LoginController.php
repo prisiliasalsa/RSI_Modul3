@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Route;
 
 class LoginController extends Controller
 {
@@ -130,40 +129,18 @@ class LoginController extends Controller
             }
         }
 
-        // Login Calon Penghuni
-        if ($peran === 'Calon Penghuni') {
-            if ($jenisAkun !== 'Calon Penghuni') {
+        if ($peran !== 'Pemilik Kost') {
+            if (!in_array($jenisAkun, ['Calon Penghuni', 'Penghuni'], true)) {
                 return $this->loginGagal(
                     $request,
-                    'Akun ini bukan akun Calon Penghuni.'
-                );
-            }
-        }
-
-        // Login Penghuni
-        if ($peran === 'Penghuni') {
-            if (!in_array(
-                $jenisAkun,
-                ['Calon Penghuni', 'Penghuni'],
-                true
-            )) {
-                return $this->loginGagal(
-                    $request,
-                    'Akun ini bukan akun Penghuni.'
+                    'Akun ini tidak bisa masuk melalui peran penghuni.'
                 );
             }
 
             try {
-                // Mengambil data penghuni aktif
-                $penghuni = DB::table('penghuni')
-                    ->where(
-                        'idAkun',
-                        $dataAkun->idAkun
-                    )
-                    ->where('status', 'Aktif')
-                    ->orderByDesc('idPenghuni')
-                    ->first();
-
+                $idPenghuni = \App\Http\Middleware\SinkronkanPeranHunian::idPenghuniAktif(
+                    (int) $dataAkun->idAkun
+                );
             } catch (\Throwable $e) {
                 report($e);
 
@@ -173,14 +150,7 @@ class LoginController extends Controller
                 );
             }
 
-            if (!$penghuni) {
-                return $this->loginGagal(
-                    $request,
-                    'Akun belum memiliki hunian aktif.'
-                );
-            }
-
-            $idPenghuni = (int) $penghuni->idPenghuni;
+            $peran = $idPenghuni === null ? 'Calon Penghuni' : 'Penghuni';
         }
 
         /*
@@ -298,25 +268,8 @@ class LoginController extends Controller
                 ->route('kost.daftar');
         }
 
-        // PENGHUNI -> UC-08
-        if ($jenisAkun === 'Penghuni') {
-            return redirect()
-                ->route('keluhan.status');
-        }
-
-        // CALON PENGHUNI -> UC-03
-        if ($jenisAkun === 'Calon Penghuni') {
-
-            if (Route::has('kost.cari')) {
-                return redirect()
-                    ->route('kost.cari');
-            }
-
-            return redirect('/')
-                ->with(
-                    'info',
-                    'Login berhasil. Halaman Cari Kost belum terdaftar.'
-                );
+        if (in_array($jenisAkun, ['Penghuni', 'Calon Penghuni'], true)) {
+            return redirect()->route('kost.cari');
         }
 
         return redirect()

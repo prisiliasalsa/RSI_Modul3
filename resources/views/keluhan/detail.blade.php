@@ -2,10 +2,7 @@
 
 @section('title', 'Detail Keluhan')
 @section('heading', 'Detail keluhan')
-@section(
-    'subtitle',
-    'Status laporan akan diperbarui oleh pemilik kost melalui UC-14.'
-)
+@section('subtitle', 'Pantau status laporan dan tanggapi pertanyaan dari pemilik kost.')
 
 @section('content')
 
@@ -44,9 +41,7 @@
 
     <div class="detail-full">
         <dt>Deskripsi keluhan</dt>
-        <dd class="multiline">
-            {{ $detail['deskripsi'] }}
-        </dd>
+        <dd class="multiline">{{ $detail['deskripsi'] }}</dd>
     </div>
 
     <div class="detail-full">
@@ -65,12 +60,40 @@
         </dd>
     </div>
 
-    @if ($laporan->informasiTambahan)
+    @php
+        $tambahan = $laporan->informasiTambahan;
+        $info = json_decode((string) $tambahan, true);
+        $permintaan = is_array($info) && ($info['uc14'] ?? false) === true;
+        $pertanyaan = $permintaan ? ($info['pertanyaan'] ?? null) : null;
+        $jawaban = $permintaan ? ($info['jawaban'] ?? null) : null;
+    @endphp
+
+    @if ($permintaan && filled($pertanyaan))
+        <div class="detail-full">
+            <dt>Pertanyaan dari pemilik</dt>
+            <dd class="multiline">{{ $pertanyaan }}</dd>
+        </div>
+
+        @if (filled($jawaban))
+            <div class="detail-full">
+                <dt>Jawaban kamu</dt>
+                <dd class="multiline">{{ $jawaban }}</dd>
+            </div>
+        @else
+            <div class="detail-full">
+                <dt>Tanggapan</dt>
+                <dd>
+                    <a class="btn btn-primary"
+                       href="{{ route('keluhan.tanggapan', $laporan->idKeluhan) }}">
+                        Beri tanggapan
+                    </a>
+                </dd>
+            </div>
+        @endif
+    @elseif (!$permintaan && filled($tambahan))
         <div class="detail-full">
             <dt>Informasi tambahan</dt>
-            <dd class="multiline">
-                {{ $laporan->informasiTambahan }}
-            </dd>
+            <dd class="multiline">{{ $tambahan }}</dd>
         </div>
     @endif
 

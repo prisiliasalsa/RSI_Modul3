@@ -1,265 +1,143 @@
 <?php
-session_start();
 
-class KontrolPengajuanSewa
+namespace App\Http\Controllers;
+
+use App\Models\Notifikasi;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
+use RuntimeException;
+use Throwable;
+
+class KontrolPengajuanSewa extends Controller
 {
-    private $conn;
-
-    public function __construct()
+    public function tampilFormAjukanSewa(Request $request, int $idKamar)
     {
-        $host = '127.0.0.1';
-        $dbname = 'kost_io';
-        $username = 'root';
-        $password = '';
+        if (!$request->session()->has('idAkun')) {
+            return redirect()->route('login');
+        }
+
+        abort_unless(
+            $request->session()->get('jenisAkun') === 'Calon Penghuni',
+            403
+        );
+
+        $kamar = $this->kamarTersedia($idKamar)->first();
+
+        abort_unless($kamar, 404, 'Kamar tidak tersedia untuk diajukan.');
+
+        return view('pengajuan.ajukan', compact('kamar'));
+    }
+
+    public function simpanPengajuan(Request $request, int $idKamar)
+    {
+        if (!$request->session()->has('idAkun')) {
+            return redirect()->route('login');
+        }
+
+        abort_unless(
+            $request->session()->get('jenisAkun') === 'Calon Penghuni',
+            403
+        );
+
+        $data = $request->validate([
+            'tanggalMulaiSewa' => ['required', 'date_format:Y-m-d', 'after_or_equal:today'],
+            'durasiSewa' => ['required', 'integer', 'min:1', 'max:2147483647'],
+            'jumlahPenghuni' => ['required', 'integer', 'min:1', 'max:2147483647'],
+            'catatan' => ['nullable', 'string', 'max:1000'],
+            'berkasKTP' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
+        ]);
+
+        $idAkun = (int) $request->session()->get('idAkun');
+        $berkas = null;
 
         try {
-            $this->conn = new PDO(
-                "mysql:host=$host;dbname=$dbname;charset=utf8mb4",
-                $username,
-                $password
-            );
+            $berkas = $request->file('berkasKTP')
+                ->store('pengajuan-sewa/ktp', 'local');
 
-            $this->conn->setAttribute(
-                PDO::ATTR_ERRMODE,
-                PDO::ERRMODE_EXCEPTION
-            );
-        } catch (PDOException $e) {
-            die('Koneksi database gagal: ' . $e->getMessage());
-        }
-    }
-
-    // Mengambil informasi kamar beserta informasi kost.
-    private function ambilDataKamar($idKamar)
-    {
-        $sql = "SELECT
-                    kamar.*,
-                    kost.namaKost,
-                    kost.alamat,
-                    kost.lokasi,
-                    kost.tipeKost,
-                    kost.fotoUtama,
-                    kost.fotoKost
-                FROM kamar
-                INNER JOIN kost
-                    ON kamar.idKost = kost.idKost
-                WHERE kamar.idKamar = :idKamar
-                LIMIT 1";
-
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':idKamar' => $idKamar]);
-
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    // Menampilkan halaman formulir pengajuan sewa.
-    public function tampilFormAjukanSewa()
-    {
-        $idKamar = $_GET['idKamar'] ?? '';
-
-        if (!ctype_digit((string) $idKamar)) {
-            die('ID kamar tidak valid.');
-        }
-
-        $kamar = $this->ambilDataKamar($idKamar);
-
-        if (!$kamar) {
-            die('Data kamar tidak ditemukan.');
-        }
-
-        if (
-            strtolower(trim($kamar['statusKamar'] ?? '')) !== 'tersedia'
-        ) {
-            die('Maaf, kamar ini sedang tidak tersedia.');
-        }
-
-        $pesanError = $_GET['error'] ?? '';
-
-        require_once __DIR__ . '/../view/FormAjukanSewa.php';
-    }
-
-    // Memproses formulir pengajuan sewa.
-    public function simpanPengajuan()
-    {
-        $idKamar = $_POST['idKamar'] ?? '';
-
-        if (!ctype_digit((string) $idKamar)) {
-            die('ID kamar tidak valid.');
-        }
-
-        // Mengambil ID akun dari session login.
-        $idCalonPenghuni = $_SESSION['idAkun'] ?? null;
-
-        if (!$idCalonPenghuni) {
-            die('Silakan login terlebih dahulu sebelum mengajukan sewa.');
-        }
-
-        $kamar = $this->ambilDataKamar($idKamar);
-
-        if (!$kamar) {
-            die('Data kamar tidak ditemukan.');
-        }
-
-        if (
-            strtolower(trim($kamar['statusKamar'] ?? '')) !== 'tersedia'
-        ) {
-            die('Maaf, kamar ini sudah tidak tersedia.');
-        }
-
-        $tanggalMulai = $_POST['tanggalMulaiSewa'] ?? '';
-        $durasiSewa = $_POST['durasiSewa'] ?? '';
-        $jumlahPenghuni = $_POST['jumlahPenghuni'] ?? '';
-        $catatan = trim($_POST['catatan'] ?? '');
-
-        // Validasi input.
-        if (
-            empty($tanggalMulai) ||
-            !preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggalMulai) ||
-            $tanggalMulai < date('Y-m-d')
-        ) {
-            header(
-                'Location: KontrolPengajuanSewa.php?aksi=form&idKamar=' .
-                urlencode($idKamar) . '&error=tanggal'
-            );
-            exit;
-        }
-
-        if (
-            !ctype_digit((string) $durasiSewa) ||
-            (int) $durasiSewa < 1
-        ) {
-            die('Durasi sewa tidak valid.');
-        }
-
-        if (
-            !ctype_digit((string) $jumlahPenghuni) ||
-            (int) $jumlahPenghuni < 1
-        ) {
-            die('Jumlah penghuni tidak valid.');
-        }
-
-        // Validasi file KTP.
-        if (
-            !isset($_FILES['berkasKTP']) ||
-            $_FILES['berkasKTP']['error'] !== UPLOAD_ERR_OK
-        ) {
-            die('Silakan unggah dokumen KTP terlebih dahulu.');
-        }
-
-        $file = $_FILES['berkasKTP'];
-
-        if ($file['size'] > 2 * 1024 * 1024) {
-            die('Ukuran file KTP maksimal 2 MB.');
-        }
-
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        $mime = $finfo->file($file['tmp_name']);
-
-        $formatDiizinkan = [
-            'image/jpeg' => 'jpg',
-            'image/png' => 'png',
-            'application/pdf' => 'pdf'
-        ];
-
-        if (!isset($formatDiizinkan[$mime])) {
-            die('Format dokumen harus JPG, PNG, atau PDF.');
-        }
-
-        // Menyiapkan folder penyimpanan.
-        $folderUpload = __DIR__ . '/../uploads/ktp/';
-
-        if (!is_dir($folderUpload)) {
-            mkdir($folderUpload, 0775, true);
-        }
-
-        // Nama file dibuat unik agar tidak saling menimpa.
-        $namaFile = 'ktp_' . uniqid() . '.' . $formatDiizinkan[$mime];
-
-        $tujuanFile = $folderUpload . $namaFile;
-        $pathDatabase = 'uploads/ktp/' . $namaFile;
-
-        if (!move_uploaded_file($file['tmp_name'], $tujuanFile)) {
-            die('Dokumen KTP gagal diunggah.');
-        }
-
-        try {
-            $sql = "INSERT INTO pengajuansewa (
-                        idCalonPenghuni,
-                        idKamar,
-                        idKost,
-                        tanggalMulaiSewa,
-                        durasiSewa,
-                        jumlahPenghuni,
-                        catatan,
-                        berkasKTP,
-                        status,
-                        tanggalPengajuan
-                    ) VALUES (
-                        :idCalonPenghuni,
-                        :idKamar,
-                        :idKost,
-                        :tanggalMulaiSewa,
-                        :durasiSewa,
-                        :jumlahPenghuni,
-                        :catatan,
-                        :berkasKTP,
-                        :status,
-                        CURDATE()
-                    )";
-
-            $stmt = $this->conn->prepare($sql);
-
-            $stmt->execute([
-                ':idCalonPenghuni' => $idCalonPenghuni,
-                ':idKamar' => $kamar['idKamar'],
-                ':idKost' => $kamar['idKost'],
-                ':tanggalMulaiSewa' => $tanggalMulai,
-                ':durasiSewa' => $durasiSewa,
-                ':jumlahPenghuni' => $jumlahPenghuni,
-                ':catatan' => $catatan,
-                ':berkasKTP' => $pathDatabase,
-                ':status' => 'Menunggu'
-            ]);
-
-            header(
-                'Location: KontrolPengajuanSewa.php?aksi=berhasil'
-            );
-            exit;
-
-        } catch (PDOException $e) {
-            // Hapus file apabila penyimpanan data gagal.
-            if (file_exists($tujuanFile)) {
-                unlink($tujuanFile);
+            if ($berkas === false) {
+                throw new RuntimeException('Berkas KTP gagal disimpan.');
             }
 
-            die('Pengajuan gagal disimpan: ' . $e->getMessage());
+            DB::transaction(function () use ($idAkun, $idKamar, $data, $berkas) {
+                $kamar = $this->kamarTersedia($idKamar)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$kamar) {
+                    throw ValidationException::withMessages([
+                        'kamar' => 'Kamar sudah tidak tersedia.',
+                    ]);
+                }
+
+                $masihMenunggu = DB::table('pengajuansewa')
+                    ->where('idCalonPenghuni', $idAkun)
+                    ->where('idKamar', $idKamar)
+                    ->whereIn('status', ['Menunggu', 'Menunggu Verifikasi'])
+                    ->exists();
+
+                if ($masihMenunggu) {
+                    throw ValidationException::withMessages([
+                        'kamar' => 'Pengajuan untuk kamar ini masih menunggu verifikasi.',
+                    ]);
+                }
+
+                $idPengajuan = (int) DB::table('pengajuansewa')
+                    ->lockForUpdate()
+                    ->max('idPengajuan') + 1;
+
+                DB::table('pengajuansewa')->insert([
+                    'idPengajuan' => $idPengajuan,
+                    'idCalonPenghuni' => $idAkun,
+                    'idKamar' => $kamar->idKamar,
+                    'idKost' => $kamar->idKost,
+                    'tanggalMulaiSewa' => $data['tanggalMulaiSewa'],
+                    'durasiSewa' => $data['durasiSewa'],
+                    'jumlahPenghuni' => $data['jumlahPenghuni'],
+                    'catatan' => $data['catatan'] ?? null,
+                    'berkasKTP' => $berkas,
+                    'status' => 'Menunggu Verifikasi',
+                    'tanggalPengajuan' => now()->toDateString(),
+                ]);
+
+                Notifikasi::catatPengajuan(
+                    $idPengajuan,
+                    'Ada pengajuan sewa baru untuk kamar ' . $kamar->nomorKamar . '.',
+                    (int) $kamar->idPemilik
+                );
+            }, 3);
+        } catch (Throwable $error) {
+            if (is_string($berkas)) {
+                try {
+                    Storage::disk('local')->delete($berkas);
+                } catch (Throwable $errorHapus) {
+                    report($errorHapus);
+                }
+            }
+
+            if ($error instanceof ValidationException) {
+                throw $error;
+            }
+
+            report($error);
+
+            return back()->withInput()->withErrors([
+                'pengajuan' => 'Pengajuan gagal disimpan. Silakan coba lagi.',
+            ]);
         }
+
+        return redirect()->route('pengajuan.status')
+            ->with('pesan', 'Pengajuan sewa berhasil dikirim.');
     }
 
-    // Halaman konfirmasi pengajuan berhasil.
-    public function tampilBerhasil()
+    private function kamarTersedia(int $idKamar)
     {
-        require_once __DIR__ . '/../view/FormPengajuanBerhasil.php';
+        return DB::table('kamar as m')
+            ->join('kost as k', 'k.idKost', '=', 'm.idKost')
+            ->where('m.idKamar', $idKamar)
+            ->where('m.statusKamar', 'Tersedia')
+            ->where('k.status', 'Dipublikasikan')
+            ->select('m.idKamar', 'm.idKost', 'm.nomorKamar', 'm.hargaSewa', 'k.namaKost', 'k.idPemilik');
     }
-}
-
-// Menjalankan aksi berdasarkan parameter URL.
-$controller = new KontrolPengajuanSewa();
-
-$aksi = $_GET['aksi'] ?? 'form';
-
-switch ($aksi) {
-    case 'form':
-        $controller->tampilFormAjukanSewa();
-        break;
-
-    case 'simpan':
-        $controller->simpanPengajuan();
-        break;
-
-    case 'berhasil':
-        $controller->tampilBerhasil();
-        break;
-
-    default:
-        die('Aksi tidak ditemukan.');
 }

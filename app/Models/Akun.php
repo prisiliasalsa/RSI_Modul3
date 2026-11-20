@@ -16,7 +16,7 @@ class Akun extends Model
     /** Pilihan dropdown "Jenis akun" (UI-01.01). Kolom jenisAkun = VARCHAR(30). */
     public const JENIS_AKUN_PILIHAN = ['Calon Penghuni', 'Pemilik Kost'];
 
-    protected $table = 'Akun';
+    protected $table = 'akun';
     protected $primaryKey = 'idAkun';
     public $incrementing = false;
     protected $keyType = 'int';
@@ -53,7 +53,7 @@ class Akun extends Model
             DB::transaction(function () use ($nama, $email, $noTelepon, $kataSandiTerenkripsi, $jenisAkun) {
                 // idAkun pada schema bukan AUTO_INCREMENT, jadi id berikutnya dihitung di sini.
                 $idAkun = (int) DB::selectOne(
-                    'SELECT COALESCE(MAX(`idAkun`), 0) + 1 AS id FROM `Akun` FOR UPDATE'
+                    'SELECT COALESCE(MAX(`idAkun`), 0) + 1 AS id FROM `akun` FOR UPDATE'
                 )->id;
 
                 // Atribut "nama" pada diagram = kolom namaLengkap pada schema.

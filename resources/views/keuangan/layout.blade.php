@@ -22,138 +22,24 @@
         rel="stylesheet"
         href="{{ asset('assets/kostio/keuangan.css') }}?v={{ $versiCss }}"
     >
+    @include('layouts.partials.kostio-ui-assets')
 </head>
 
-<body class="finance15">
+<body class="finance15 kio-ready kio-owner">
+    @include('layouts.partials.kostio-ui-shell', ['kioRenderServer' => true])
 
 <div class="finance-shell">
 
     {{-- SIDEBAR PEMILIK --}}
-    <aside class="finance-sidebar">
-
-        <div class="finance-logo">
-            @include('keluhan.pemilik.icon', [
-                'name' => 'home',
-                'size' => 22
-            ])
-
-            <strong>kost.io</strong>
-        </div>
-
-        <div class="finance-workspace">
-            <small>RUANG PEMILIK</small>
-            <span>Kelola hunianmu</span>
-        </div>
-
-        <nav class="finance-nav" aria-label="Navigasi pemilik">
-
-            <span class="finance-nav-link">
-                @include('keluhan.pemilik.icon', ['name' => 'home'])
-                Kelola Kost
-            </span>
-
-            <span class="finance-nav-link">
-                @include('keluhan.pemilik.icon', ['name' => 'key'])
-                Kelola Kamar
-            </span>
-
-            <span class="finance-nav-link">
-                @include('keluhan.pemilik.icon', ['name' => 'file'])
-                Pengajuan Sewa
-            </span>
-
-            <span class="finance-nav-link">
-                @include('keluhan.pemilik.icon', ['name' => 'users'])
-                Data Penghuni
-            </span>
-
-            <span class="finance-nav-link">
-                @include('keluhan.pemilik.icon', ['name' => 'wallet'])
-                Verifikasi Pembayaran
-            </span>
-
-            
-            {{-- UC-14: Keluhan / Kerusakan --}}
-            @if (\Illuminate\Support\Facades\Route::has('pemilik.keluhan.daftar'))
-
-                <a
-                    class="finance-nav-link"
-                    href="{{ route('pemilik.keluhan.daftar') }}"
-                >
-                    @include('keluhan.pemilik.icon', [
-                        'name' => 'chat'
-                    ])
-
-                    Keluhan / Kerusakan
-                </a>
-
-            @else
-
-                <span class="finance-nav-link">
-                    @include('keluhan.pemilik.icon', [
-                        'name' => 'chat'
-                    ])
-
-                    Keluhan / Kerusakan
-                </span>
-
-            @endif
-
-
-            <a
-                class="finance-nav-link selected"
-                href="{{ route('pemilik.keuangan.index') }}"
-                aria-current="page"
-            >
-                @include('keluhan.pemilik.icon', ['name' => 'chart'])
-                Laporan Keuangan
-            </a>
-
-        </nav>
-
-        <div class="finance-spacer"></div>
-
-        <div class="finance-help">
-            <strong>Butuh bantuan?</strong>
-            <p>Kelola tempat tinggal dengan lebih tenang.</p>
-        </div>
-
-        <div class="finance-logout">
-            @include('keluhan.pemilik.icon', ['name' => 'logout'])
-            Keluar
-        </div>
-
+    <aside class="finance-sidebar kio-sidebar">
+        @yield('kioResidentSidebar')
     </aside>
 
     {{-- KONTEN UTAMA --}}
     <div class="finance-workspace-main">
 
-        <header class="finance-topbar">
-
-            <div class="finance-crumb-top">
-                Kost.io <span>/</span> Pemilik Kost
-            </div>
-
-            <div class="finance-account">
-
-                @include('keluhan.pemilik.icon', [
-                    'name' => 'bell',
-                    'size' => 22
-                ])
-
-                <div class="finance-avatar">
-                    PK
-                </div>
-
-                <div class="finance-account-name">
-                    <strong>
-                        {{ $pemilik->namaLengkap ?: 'Pemilik Kost' }}
-                    </strong>
-                    <small>Pemilik Kost</small>
-                </div>
-
-            </div>
-
+        <header class="finance-topbar kio-header">
+            @yield('kioResidentHeader')
         </header>
 
         <main class="finance-main">
@@ -171,9 +57,7 @@
                     }}
                 </h1>
 
-                <span class="finance-kost-tag">
-                    {{ $namaKostHeader }}
-                </span>
+                @include('layouts.partials.lencana-kost-pemilik', ['namaLencana' => $namaKostHeader])
 
             </div>
 
