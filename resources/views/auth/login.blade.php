@@ -43,7 +43,6 @@
         .info-akses { background: #e3d9c9; padding: 16px; border-radius: 8px; font-size: 0.92rem; color: #555; margin-top: 20px; }
         .info-akses strong { color: #04304f; }
         .catatan { font-size: 0.82rem; color: #666; margin-top: 20px; }
-        .error-teks { color: #b00020; font-size: 0.85rem; margin-top: 4px; }
     </style>
 </head>
 <body>
@@ -64,39 +63,37 @@
         <div class="form-box">
             <div class="eyebrow">Selamat datang kembali</div>
 
-            @if (session('error'))
-                {{-- UI-02.02: Login belum berhasil --}}
-                <div class="ikon-gagal">✓</div>
-                <h1>Login belum berhasil</h1>
-                <p class="deskripsi">Masuk untuk melanjutkan aktivitas hunianmu.</p>
-                <div class="banner">{{ session('error') }}</div>
-            @else
-                {{-- UI-02.01: Masuk ke Kost.io --}}
-                <h1>Masuk ke Kost.io</h1>
-                <p class="deskripsi">Temukan kamar dan pantau pengajuan sewamu.</p>
-
-                <div class="label-peran">Masuk sebagai</div>
-                <div class="peran">
-                    <label>
-                        <input type="radio" name="peran" value="Calon Penghuni" @checked(old('peran', 'Calon Penghuni') === 'Calon Penghuni')>
-                        <span>Calon Penghuni</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="peran" value="Penghuni" @checked(old('peran') === 'Penghuni')>
-                        <span>Penghuni</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="peran" value="Pemilik Kost" @checked(old('peran') === 'Pemilik Kost')>
-                        <span>Pemilik Kost</span>
-                    </label>
-                </div>
-            @endif
-
             <form action="{{ route('login.proses') }}" method="POST">
                 @csrf
 
                 @if (session('error'))
+                    {{-- UI-02.02: Login belum berhasil --}}
+                    <div class="ikon-gagal">✓</div>
+                    <h1>Login belum berhasil</h1>
+                    <p class="deskripsi">Masuk untuk melanjutkan aktivitas hunianmu.</p>
+                    <div class="banner">{{ session('error') }}</div>
+
                     <input type="hidden" name="peran" value="{{ old('peran', 'Calon Penghuni') }}">
+                @else
+                    {{-- UI-02.01: Masuk ke Kost.io --}}
+                    <h1>Masuk ke Kost.io</h1>
+                    <p class="deskripsi">Temukan kamar dan pantau pengajuan sewamu.</p>
+
+                    <div class="label-peran">Masuk sebagai</div>
+                    <div class="peran">
+                        <label>
+                            <input type="radio" name="peran" value="Calon Penghuni" @checked(old('peran', 'Calon Penghuni') === 'Calon Penghuni')>
+                            <span>Calon Penghuni</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="peran" value="Penghuni" @checked(old('peran') === 'Penghuni')>
+                            <span>Penghuni</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="peran" value="Pemilik Kost" @checked(old('peran') === 'Pemilik Kost')>
+                            <span>Pemilik Kost</span>
+                        </label>
+                    </div>
                 @endif
 
                 <div class="baris-dua">
@@ -122,12 +119,12 @@
                 @if (session('error'))
                     <div class="tombol">
                         <button type="submit" class="btn btn-utama">Coba masuk lagi</button>
-                        <a href="#" class="btn">Daftar akun</a>
+                        <a href="{{ route('registrasi.form') }}" class="btn">Daftar akun</a>
                     </div>
                 @else
                     <div class="tombol">
                         <button type="submit" class="btn btn-utama">Masuk</button>
-                        <a href="#" class="btn">Buat akun</a>
+                        <a href="{{ route('registrasi.form') }}" class="btn">Buat akun</a>
                     </div>
                 @endif
             </form>
