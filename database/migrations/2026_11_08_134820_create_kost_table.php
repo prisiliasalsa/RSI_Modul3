@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::create('kost', function (Blueprint $table) {
             $table->increments('idKost');
-            $table->foreignId('idPemilik')->constrained('users');
+            $table->unsignedInteger('idPemilik');
+            $table->foreign('idPemilik')->references('idAkun')->on('akun');
             $table->string('namaKost', 100);
             $table->string('alamat', 255);
             $table->string('lokasi', 100);
