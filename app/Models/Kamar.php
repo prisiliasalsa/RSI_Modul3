@@ -62,4 +62,10 @@ class Kamar extends Model
 
         return true;
     }
+    /** hapusData(idKamar): hasilHapus() pada sequence Hapus. */
+    public static function hapusData(int $idKamar): bool
+    {
+        return DB::table('kamar')->where('idKamar', $idKamar)->delete() > 0;
+    }
 }
+

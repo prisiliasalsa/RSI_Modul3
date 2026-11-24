@@ -42,48 +42,63 @@ class KamarController extends Controller
     }
 
     public function hapusKamar($idKost, $idKamar)
-    {
-        Kost::findOrFail($idKost);
+{
+    // tekanHapus(id) -> konfirmasi hapus()
+    $kost = $this->untukTampilanKost(Kost::findOrFail($idKost));
 
-        $kamar = $this->cariKamar($idKost, $idKamar);
+    $kamar = $this->untukTampilanKamar(
+        $this->cariKamar($idKost, $idKamar)
+    );
 
-        if ($kamar->statusKamar === 'Terisi') {
-            return redirect()
-                ->route('kamar.index', $idKost)
-                ->with('error', 'Kamar sedang terisi dan tidak dapat dihapus');
-        }
+    return view('kamar.konfirmasi-hapus', compact('kost', 'kamar', 'idKost'));
+}
 
-        $kamar = $this->untukTampilanKamar($kamar);
+public function konfirmasiHapus($idKost, $idKamar)
+{
+    Kost::findOrFail($idKost);
 
-        return view('kamar.konfirmasi-hapus', compact('kamar', 'idKost'));
+    $kamar = $this->cariKamar($idKost, $idKamar);
+
+    // cekKamarTerisi(id) -> statusKamar()
+    if (Kamar::cekKamarTerisi((int) $kamar->idKamar) === 'Terisi') {
+        // alt: [masih ada penghuni aktif] -> tampilGagal()
+        return redirect()
+            ->route('kamar.index', $idKost)
+            ->with('error', 'Kamar tidak dapat dihapus karena masih ada penghuni aktif');
     }
 
-    public function konfirmasiHapus($idKost, $idKamar)
-    {
-        Kost::findOrFail($idKost);
+    // alt: [tidak ada penghuni] -> hapusData(id) -> hasilHapus()
+    try {
+        $berhasil = Kamar::hapusData((int) $kamar->idKamar);
+    } catch (\Illuminate\Database\QueryException $e) {
+        report($e);
 
-        $kamar = $this->cariKamar($idKost, $idKamar);
-
-        if ($kamar->statusKamar === 'Terisi') {
-            return redirect()
-                ->route('kamar.index', $idKost)
-                ->with('error', 'Kamar sedang terisi dan tidak dapat dihapus');
-        }
-
-        try {
-            $kamar->delete();
-        } catch (\Throwable $e) {
-            report($e);
-
-            return redirect()
-                ->route('kamar.index', $idKost)
-                ->with('error', 'Data kamar gagal dihapus, silakan coba kembali');
-        }
+        $pesan = $e->getCode() === '23000'
+            ? 'Kamar memiliki riwayat pengajuan sewa sehingga tidak dapat dihapus'
+            : 'Data kamar gagal dihapus, silakan coba kembali';
 
         return redirect()
             ->route('kamar.index', $idKost)
-            ->with('pesan', 'Data kamar berhasil dihapus');
+            ->with('error', $pesan);
+    } catch (\Throwable $e) {
+        report($e);
+
+        return redirect()
+            ->route('kamar.index', $idKost)
+            ->with('error', 'Data kamar gagal dihapus, silakan coba kembali');
     }
+
+    if (!$berhasil) {
+        return redirect()
+            ->route('kamar.index', $idKost)
+            ->with('error', 'Data kamar gagal dihapus, silakan coba kembali');
+    }
+
+    // tampilBerhasil() -> pesan berhasil()
+    return redirect()
+        ->route('kamar.index', $idKost)
+        ->with('pesan', 'Data kamar berhasil dihapus');
+}
 
     public function simpanKamar(Request $request, $idKost, $idKamar = null)
     {
